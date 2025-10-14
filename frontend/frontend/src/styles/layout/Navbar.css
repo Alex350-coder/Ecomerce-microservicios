@@ -1,0 +1,17 @@
+.navbar {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar__container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  overflow-x: auto;
+  width: 100%;
+  margin: 0;
+}

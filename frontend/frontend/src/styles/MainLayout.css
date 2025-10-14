@@ -1,0 +1,13 @@
+.main-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* El contenido principal debe CRECER libremente */
+.main-content {
+  flex: 1;
+  width: 100%;
+  /* SIN height fijo, SIN overflow, SIN position */
+  /* Que crezca naturalmente con el contenido */
+}
