@@ -1,13 +1,16 @@
-.header {
-  background-color: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
+/* Contenedor principal que incluye Header + Navbar */
+.header-container {
+  width: 100%;
   position: sticky;
   top: 0;
   z-index: 100;
+  background-color: var(--bg-secondary);
+}
+
+/* Header principal */
+.header-main {
+  border-bottom: 1px solid var(--border-color);
   backdrop-filter: blur(10px);
-  width: 100%;
-  margin: 0;
-  padding: 0;
 }
 
 .header__container {
@@ -17,7 +20,8 @@
   padding: 1rem 2rem;
   gap: 2rem;
   width: 100%;
-  margin: 0;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .header__logo {
@@ -63,4 +67,18 @@
   align-items: center;
   gap: 1rem;
   flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header__container {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .header__search {
+    max-width: none;
+    width: 100%;
+  }
 }
