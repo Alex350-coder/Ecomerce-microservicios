@@ -2,6 +2,7 @@ import React from 'react';
 import { MainLayout } from '../templates/MainLayout';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
+import { Link } from 'react-router-dom';
 import '../styles/pages/Home.css';
 
 export const Home = () => {
@@ -42,8 +43,9 @@ export const Home = () => {
               Encuentra los mejores productos electrónicos con precios increíbles y envío rápido.
             </p>
             <div className="hero__actions">
+              <Link to="/products">
               <Button size="lg">Comprar Ahora</Button>
-              <Button variant="outline" size="lg">Ver Catálogo</Button>
+              </Link>
             </div>
           </div>
         </section>
@@ -77,5 +79,3 @@ export const Home = () => {
     </MainLayout>
   );
 };
-
-export default Home;

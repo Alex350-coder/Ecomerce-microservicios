@@ -1,7 +1,9 @@
 import React from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import { Navbar } from './Navbar';  // ← Importar Navbar aquí
+import { Navbar } from './Navbar'; 
+import { CartIcon } from '../ui/CartIcon'; 
+import { Link } from 'react-router-dom';
 import '../../styles/layout/Header.css';
 
 export const Header = () => {
@@ -27,18 +29,22 @@ export const Header = () => {
 
           {/* Navegación */}
           <nav className="header__nav">
-            <Button variant="ghost" size="sm">
-              🛒 Carrito
-            </Button>
+            <CartIcon />
+            <Link to="/account">
             <Button variant="ghost" size="sm">
               👤 Cuenta
             </Button>
+            </Link>
+            <Link to="/login">
             <Button variant="outline" size="sm">
               Login
             </Button>
+            </Link>
+            <Link to="/register">
             <Button variant="primary" size="sm">
               Registrarse
             </Button>
+            </Link>
           </nav>
         </div>
       </header>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Header } from '../components/layout/Header';  
 import { Footer } from '../components/layout/Footer';
-import '../styles/MainLayout.css';
+import '../styles/templates/MainLayout.css';
 
 export const MainLayout = ({ children }) => {
   return (
