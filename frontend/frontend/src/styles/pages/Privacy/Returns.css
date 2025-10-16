@@ -1,0 +1,92 @@
+.returns-page {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.returns-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.returns-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.returns-header p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.returns-content {
+  display: flex;
+  justify-content: center;
+}
+
+.policy-card {
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 800px;
+}
+
+.policy-card h2 {
+  font-size: 1.75rem;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.policy-section {
+  margin-bottom: 2rem;
+}
+
+.policy-section h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.policy-section p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.policy-section ul {
+  color: var(--text-secondary);
+  padding-left: 1.5rem;
+  line-height: 1.6;
+}
+
+.policy-section li {
+  margin-bottom: 0.5rem;
+}
+
+.policy-actions {
+  text-align: center;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.contact-info {
+  margin-top: 1rem;
+  color: var(--text-secondary);
+}
+
+.contact-info strong {
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .returns-page {
+    padding: 1rem;
+  }
+  
+  .policy-card {
+    padding: 1.5rem;
+  }
+}
