@@ -1,17 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Home } from './pages/Home';
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
-import { Account } from './pages/Account';
-import { Checkout } from './pages/Checkout';
-import { Products } from './pages/Products';
-import { About } from './pages/FastLinks/About';
-import { Contact } from './pages/FastLinks/Contact';
-import { Support } from './pages/FastLinks/Support';
-import { Privacy } from './pages/Privacy/Privacy';
-import { Returns } from './pages/Privacy/Returns';
-import { ReturnRequest } from './pages/Privacy/ReturnRequest';
-import { Terms } from './pages/Privacy/Terms';
+import {Home, Login, Register, Account, Checkout, Products} from './pages';
+import {About, Contact, Support} from './pages/FastLinks';
+import {Privacy, Returns, ReturnRequest, Terms} from './pages/Privacy';
 
 import './styles/globals.css';
 import './styles/variables.css';
