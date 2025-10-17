@@ -6,7 +6,6 @@
   background-color: var(--bg-secondary);
 }
 
-/* Header principal */
 .header-main {
   border-bottom: 1px solid var(--border-color);
   backdrop-filter: blur(10px);
