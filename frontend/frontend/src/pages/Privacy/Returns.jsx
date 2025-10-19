@@ -62,10 +62,12 @@ export const Returns = () => {
                 </Button>
               </Link>
               
+              <Link to="/contact">
               <p className="contact-info">
                 ¿Tienes dudas? Contáctanos: 
                 <strong> devoluciones@electroshop.com</strong>
               </p>
+              </Link>
             </div>
           </Card>
         </div>
