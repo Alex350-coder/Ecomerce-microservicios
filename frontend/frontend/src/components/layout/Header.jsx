@@ -13,11 +13,13 @@ export const Header = () => {
       <header className="header-main">
         <div className="header__container">
           {/* Logo */}
+          <Link to="/">
           <div className="header__logo">
             <div className="logo__icon">E</div>
             <span className="logo__text">ElectroShop</span>
           </div>
-
+          </Link>
+          
           {/* Barra de búsqueda */}
           <div className="header__search">
             <Input
