@@ -122,3 +122,287 @@
     padding: 1.5rem;
   }
 }
+
+/* 🆕 Mensajes de cuenta */
+.account-message {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.account-message.error-message {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.account-message.success-message {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border: 1px solid #c3e6cb;
+  color: #155724;
+}
+
+/* 🆕 Verificación de email */
+.email-verification {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.verification-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.verification-status.verified {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.verification-status.not-verified {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+/* 🆕 Formulario de cambio de contraseña */
+/* 🆕 Formulario de cambio de contraseña mejorado */
+.password-change-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 450px;
+  padding: 1.5rem;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  margin-top: 1rem;
+}
+
+.password-change-form .input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.password-change-form .input-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.password-change-form .input-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.password-change-form .input-field:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.password-change-form .input-field:disabled {
+  background: var(--bg-disabled);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.password-change-form .password-strength {
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.password-strength.weak {
+  color: #dc2626;
+}
+
+.password-strength.medium {
+  color: #d97706;
+}
+
+.password-strength.strong {
+  color: #059669;
+}
+
+.password-change-form .form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.password-change-form .form-actions button {
+  flex: 1;
+}
+
+/* 🆕 Indicadores de seguridad */
+.security-indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+}
+
+.security-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.security-indicator .indicator-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+.security-indicator.secure .indicator-icon {
+  background: #10b981;
+  color: white;
+}
+
+.security-indicator.warning .indicator-icon {
+  background: #f59e0b;
+  color: white;
+}
+
+.security-indicator.danger .indicator-icon {
+  background: #ef4444;
+  color: white;
+}
+
+/* 🆕 Animaciones para el formulario */
+.password-change-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 500px;
+  width: 100%;
+  margin: 1rem auto;
+  padding: 2rem;
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 🆕 Estados de validación */
+.password-change-form .input-field.invalid {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+
+.password-change-form .input-field.valid {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.validation-message {
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.validation-message.error {
+  color: #dc2626;
+}
+
+.validation-message.success {
+  color: #059669;
+}
+
+/* 🆕 Responsive */
+@media (max-width: 768px) {
+  .password-change-form {
+    padding: 1.25rem;
+    gap: 1.25rem;
+  }
+  
+  .password-change-form .form-actions {
+    flex-direction: column;
+  }
+  
+  .security-indicators {
+    padding: 0.875rem;
+  }
+}
+
+/* 🆕 Efectos hover y focus mejorados */
+.password-change-form .input-field:hover:not(:disabled) {
+  border-color: var(--primary-light);
+}
+
+.password-change-form .input-field:focus:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+}
+
+/* 🆕 Transiciones suaves */
+.password-change-form * {
+  transition: all 0.2s ease-in-out;
+}
+
+.security-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 🆕 Estados de carga */
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* 🆕 Responsive */
+@media (max-width: 768px) {
+  .email-verification {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .edit-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .edit-actions button {
+    width: 100%;
+  }
+}
