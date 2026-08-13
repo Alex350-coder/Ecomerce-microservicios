@@ -1,8 +1,7 @@
 # ENV — Variables de entorno
 
 Inventario de variables por paquete y por capa. Todos los secretos viven en
-`.env` (raíz) o en el `.env` local de cada paquete; **nunca se commitean**
-(`security/08-SECRETS-MANAGEMENT.md`).
+`.env` (raíz) o en el `.env` local de cada paquete; **nunca se commitean**.
 
 ## Root (docker-compose)
 

@@ -15,7 +15,7 @@ Guía para levantar el stack completo de ElectroShop (MySQL + 8 servicios + fron
 | Gateway (API) | `8001`      | `8000`            | Host + frontend (proxy nginx) |
 | Frontend      | `5173`      | `80` (nginx)      | Host |
 
-> Los 7 servicios core **no publican puertos al host** (seguridad `security/10` y `security/12`).
+> Los 7 servicios core **no publican puertos al host**.
 > Solo se prueban desde dentro de la red (ver smoke test).
 
 ## Puesta en marcha

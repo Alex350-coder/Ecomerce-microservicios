@@ -1,6 +1,6 @@
 # Verificación de consistencia: lint + typecheck + build + test por paquete.
-# Paquetes cubiertos: 7 servicios core (esqueletos F1) + frontend.
-# auth-service se EXCLUYE por deuda preexistente documentada (F4, ver Progress.md).
+# Paquetes cubiertos: 7 servicios core + frontend.
+# auth-service se excluye por deuda preexistente de lint y tests.
 param(
   [switch]$SkipBuild
 )

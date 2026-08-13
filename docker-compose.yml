@@ -1,7 +1,7 @@
 name: ecomerce-microservicios
 
 # Red privada del proyecto: los servicios NO publican puertos al host
-# (solo gateway, frontend y mysql publican, según security/10 y security/12).
+# (solo gateway, frontend y mysql publican).
 # Nota: no se usa internal:true porque bloquea la publicación de puertos;
 # el aislamiento se logra no publicando puertos de los servicios.
 networks:

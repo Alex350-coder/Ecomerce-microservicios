@@ -52,7 +52,7 @@ powershell -File scripts/check-all.ps1
 GitHub Actions (`.github/workflows/ci.yml`):
 
 - `quality`: matrix por paquete (lint + typecheck + build + test). auth-service
-  tiene lint/tests no-bloqueantes por deuda preexistente documentada (F4).
+  tiene lint/tests no-bloqueantes por deuda preexistente.
 - `audit`: `npm audit --omit=dev --audit-level=high` por paquete (bloqueante).
 - `secrets`: gitleaks.
 - `smoke`: levanta el compose completo y verifica `/health` en los 8 servicios + frontend.
@@ -61,5 +61,3 @@ GitHub Actions (`.github/workflows/ci.yml`):
 
 - `docs/SETUP.md` — puesta en marcha, puertos, notas de plataforma
 - `docs/ENV.md` — inventario de variables de entorno
-- `Progress.md` — estado por fase del roadmap
-- `Planning_files/` — plan, arquitectura objetivo, gaps, Definition of Done y suite de seguridad

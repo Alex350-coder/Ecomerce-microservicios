@@ -2,7 +2,7 @@
   "name": "ecomerce-microservicios",
   "version": "0.0.1",
   "private": true,
-  "description": "Orquestación de scripts de Fase 1 (ElectroShop microservicios)",
+  "description": "Orquestación de scripts del proyecto ElectroShop (microservicios)",
   "scripts": {
     "check": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/check-all.ps1",
     "up": "docker compose -f docker-compose.yml up -d --build",
