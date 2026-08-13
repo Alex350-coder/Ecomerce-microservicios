@@ -13,7 +13,11 @@ export const Input = ({
 }) => {
   return (
     <div className="input-container">
-      {label && <label htmlFor={id} className="input-label">{label}</label>}
+      {label && (
+        <label htmlFor={id} className="input-label">
+          {label}
+        </label>
+      )}
       <input
         id={id}
         type={type}

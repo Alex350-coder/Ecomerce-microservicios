@@ -13,7 +13,7 @@ export const Checkout = () => {
     number: '',
     name: '',
     expiry: '',
-    cvv: ''
+    cvv: '',
   });
 
   // Datos de ejemplo del carrito
@@ -23,39 +23,39 @@ export const Checkout = () => {
       name: 'iPhone 14 Pro',
       price: 999,
       quantity: 1,
-      image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=80&h=80&fit=crop'
+      image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=80&h=80&fit=crop',
     },
     {
       id: 2,
       name: 'AirPods Pro',
       price: 249,
       quantity: 2,
-      image: 'https://images.unsplash.com/photo-1600294037681-c80b80b4cb5b434?w=80&h=80&fit=crop'
+      image: 'https://images.unsplash.com/photo-1600294037681-c80b80b4cb5b434?w=80&h=80&fit=crop',
     },
     {
       id: 3,
       name: 'MacBook Pro 14"',
       price: 1999,
       quantity: 1,
-      image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=80&h=80&fit=crop'
-    }
+      image: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=80&h=80&fit=crop',
+    },
   ];
 
   const shippingMethods = [
     { id: 'standard', name: 'Envío Estándar', price: 5.99, days: '5-7 días' },
     { id: 'express', name: 'Envío Express', price: 12.99, days: '2-3 días' },
-    { id: 'priority', name: 'Envío Prioritario', price: 24.99, days: '1 día' }
+    { id: 'priority', name: 'Envío Prioritario', price: 24.99, days: '1 día' },
   ];
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shippingCost = shippingMethods.find(method => method.id === shippingMethod)?.price || 0;
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const shippingCost = shippingMethods.find((method) => method.id === shippingMethod)?.price || 0;
   const tax = subtotal * 0.08; // 8% de impuesto
   const total = subtotal + shippingCost + tax;
 
   const handleCardChange = (field, value) => {
-    setCardData(prev => ({
+    setCardData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -87,7 +87,12 @@ export const Checkout = () => {
               <h2>Información de Envío</h2>
               <div className="form-grid">
                 <Input label="Nombre Completo" placeholder="Juan Pérez" required />
-                <Input label="Correo Electrónico" type="email" placeholder="juan@email.com" required />
+                <Input
+                  label="Correo Electrónico"
+                  type="email"
+                  placeholder="juan@email.com"
+                  required
+                />
                 <Input label="Teléfono" placeholder="+1 234 567 8900" required />
                 <Input label="Dirección" placeholder="Calle Principal 123" required />
                 <Input label="Ciudad" placeholder="Ciudad" required />
@@ -100,7 +105,7 @@ export const Checkout = () => {
             <Card className="checkout-section">
               <h2>Método de Envío</h2>
               <div className="shipping-methods">
-                {shippingMethods.map(method => (
+                {shippingMethods.map((method) => (
                   <label key={method.id} className="shipping-method">
                     <input
                       type="radio"
@@ -111,7 +116,9 @@ export const Checkout = () => {
                     />
                     <div className="method-info">
                       <span className="method-name">{method.name}</span>
-                      <span className="method-details">{method.days} • ${method.price}</span>
+                      <span className="method-details">
+                        {method.days} • ${method.price}
+                      </span>
                     </div>
                   </label>
                 ))}
@@ -121,7 +128,7 @@ export const Checkout = () => {
             {/* Método de Pago */}
             <Card className="checkout-section">
               <h2>Método de Pago</h2>
-              
+
               <div className="payment-methods">
                 <label className="payment-method">
                   <input
@@ -133,7 +140,7 @@ export const Checkout = () => {
                   />
                   💳 Tarjeta de Crédito/Débito
                 </label>
-                
+
                 <label className="payment-method">
                   <input
                     type="radio"
@@ -144,7 +151,7 @@ export const Checkout = () => {
                   />
                   🅿️ PayPal
                 </label>
-                
+
                 <label className="payment-method">
                   <input
                     type="radio"
@@ -202,9 +209,15 @@ export const Checkout = () => {
                 <div className="transfer-info">
                   <p>Realiza la transferencia a:</p>
                   <div className="bank-details">
-                    <p><strong>Banco:</strong> ElectroShop Bank</p>
-                    <p><strong>Cuenta:</strong> 1234-5678-9012-3456</p>
-                    <p><strong>Beneficiario:</strong> ElectroShop Inc.</p>
+                    <p>
+                      <strong>Banco:</strong> ElectroShop Bank
+                    </p>
+                    <p>
+                      <strong>Cuenta:</strong> 1234-5678-9012-3456
+                    </p>
+                    <p>
+                      <strong>Beneficiario:</strong> ElectroShop Inc.
+                    </p>
                   </div>
                 </div>
               )}
@@ -215,10 +228,10 @@ export const Checkout = () => {
           <div className="checkout-summary">
             <Card className="summary-card">
               <h2>Resumen del Pedido</h2>
-              
+
               {/* Productos */}
               <div className="summary-items">
-                {cartItems.map(item => (
+                {cartItems.map((item) => (
                   <div key={item.id} className="summary-item">
                     <img src={item.image} alt={item.name} />
                     <div className="item-info">
@@ -254,14 +267,11 @@ export const Checkout = () => {
               <div className="summary-actions">
                 <label className="terms-agreement">
                   <input type="checkbox" required />
-                  Acepto los <a href="/terms">términos y condiciones</a> y la <a href="/privacy">política de privacidad</a>
+                  Acepto los <a href="/terms">términos y condiciones</a> y la{' '}
+                  <a href="/privacy">política de privacidad</a>
                 </label>
-                
-                <Button 
-                  className="checkout-button"
-                  size="lg"
-                  onClick={handleSubmit}
-                >
+
+                <Button className="checkout-button" size="lg" onClick={handleSubmit}>
                   Completar Pedido - ${total.toFixed(2)}
                 </Button>
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import { Navbar } from './Navbar'; 
-import { CartIcon } from '../ui/CartIcon'; 
+import { Navbar } from './Navbar';
+import { CartIcon } from '../ui/CartIcon';
 import { Link } from 'react-router-dom';
 import '../../styles/layout/Header.css';
 
@@ -10,11 +10,11 @@ export const Header = () => {
   // 🆕 Verificar si el usuario está logueado
   const isLoggedIn = !!localStorage.getItem('token');
   const userData = isLoggedIn ? JSON.parse(localStorage.getItem('user') || '{}') : null;
-  
+
   // 🆕 Obtener nombre para mostrar
   const getUserDisplayName = () => {
     if (!userData) return 'Usuario';
-    
+
     if (userData.firstName && userData.lastName) {
       return `${userData.firstName} ${userData.lastName}`;
     } else if (userData.firstName) {
@@ -22,7 +22,7 @@ export const Header = () => {
     } else if (userData.email) {
       return userData.email.split('@')[0];
     }
-    
+
     return 'Usuario';
   };
 
@@ -45,20 +45,16 @@ export const Header = () => {
               <span className="logo__text">ElectroShop</span>
             </div>
           </Link>
-          
+
           {/* Barra de búsqueda */}
           <div className="header__search">
-            <Input
-              type="text"
-              placeholder="Buscar productos..."
-              className="search-input"
-            />
+            <Input type="text" placeholder="Buscar productos..." className="search-input" />
           </div>
 
           {/* Navegación */}
           <nav className="header__nav">
             <CartIcon />
-            
+
             {isLoggedIn ? (
               // 🆕 MENÚ PARA USUARIO LOGUEADO
               <div className="user-menu">
@@ -74,10 +70,7 @@ export const Header = () => {
                   <Link to="/orders" className="dropdown-item">
                     Mis Pedidos
                   </Link>
-                  <button 
-                    onClick={handleLogout}
-                    className="dropdown-item logout-button"
-                  >
+                  <button onClick={handleLogout} className="dropdown-item logout-button">
                     Cerrar Sesión
                   </button>
                 </div>

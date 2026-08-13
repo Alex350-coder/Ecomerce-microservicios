@@ -15,9 +15,7 @@ export const Privacy = () => {
         <Card className="privacy-content">
           <section className="privacy-section">
             <h2>1. Información que Recopilamos</h2>
-            <p>
-              Recopilamos información que nos proporcionas directamente, incluyendo:
-            </p>
+            <p>Recopilamos información que nos proporcionas directamente, incluyendo:</p>
             <ul>
               <li>Nombre y información de contacto</li>
               <li>Información de pago y facturación</li>
@@ -28,9 +26,7 @@ export const Privacy = () => {
 
           <section className="privacy-section">
             <h2>2. Uso de la Información</h2>
-            <p>
-              Utilizamos tu información para:
-            </p>
+            <p>Utilizamos tu información para:</p>
             <ul>
               <li>Procesar tus pedidos y pagos</li>
               <li>Gestionar tu cuenta de usuario</li>
@@ -43,26 +39,25 @@ export const Privacy = () => {
           <section className="privacy-section">
             <h2>3. Protección de Datos</h2>
             <p>
-              Implementamos medidas de seguridad técnicas y organizativas para proteger 
-              tu información personal contra accesos no autorizados, alteración, 
-              divulgación o destrucción.
+              Implementamos medidas de seguridad técnicas y organizativas para proteger tu
+              información personal contra accesos no autorizados, alteración, divulgación o
+              destrucción.
             </p>
           </section>
 
           <section className="privacy-section">
             <h2>4. Cookies y Tecnologías Similares</h2>
             <p>
-              Utilizamos cookies para mejorar tu experiencia en nuestro sitio web, 
-              recordar tus preferencias y analizar el tráfico del sitio.
+              Utilizamos cookies para mejorar tu experiencia en nuestro sitio web, recordar tus
+              preferencias y analizar el tráfico del sitio.
             </p>
           </section>
 
           <section className="privacy-section">
             <h2>5. Tus Derechos</h2>
             <p>
-              Tienes derecho a acceder, corregir o eliminar tu información personal. 
-              Puedes ejercer estos derechos contactándonos a través de nuestro 
-              formulario de contacto.
+              Tienes derecho a acceder, corregir o eliminar tu información personal. Puedes ejercer
+              estos derechos contactándonos a través de nuestro formulario de contacto.
             </p>
           </section>
 

@@ -10,21 +10,21 @@ export const Support = () => {
 
   const faqs = [
     {
-      question: "¿Cuánto tiempo tarda el envío?",
-      answer: "Los envíos estándar tardan 3-5 días hábiles. Express 1-2 días."
+      question: '¿Cuánto tiempo tarda el envío?',
+      answer: 'Los envíos estándar tardan 3-5 días hábiles. Express 1-2 días.',
     },
     {
-      question: "¿Hacen envíos internacionales?",
-      answer: "Sí, realizamos envíos a toda Latinoamérica con costos variables."
+      question: '¿Hacen envíos internacionales?',
+      answer: 'Sí, realizamos envíos a toda Latinoamérica con costos variables.',
     },
     {
-      question: "¿Qué métodos de pago aceptan?",
-      answer: "Aceptamos tarjetas de crédito/débito, PayPal y transferencias bancarias."
+      question: '¿Qué métodos de pago aceptan?',
+      answer: 'Aceptamos tarjetas de crédito/débito, PayPal y transferencias bancarias.',
     },
     {
-      question: "¿Puedo cambiar mi pedido?",
-      answer: "Sí, puedes realizar cambios dentro de las primeras 24 horas después de la compra."
-    }
+      question: '¿Puedo cambiar mi pedido?',
+      answer: 'Sí, puedes realizar cambios dentro de las primeras 24 horas después de la compra.',
+    },
   ];
 
   const toggleFaq = (index) => {
@@ -45,17 +45,19 @@ export const Support = () => {
             <p>Habla directamente con nuestro equipo</p>
             <p className="contact-info">+1 (555) 123-4567</p>
           </Card>
-          
+
           <Card className="action-card">
             <h3>📧 Email de Soporte</h3>
             <p>Envíanos un correo detallado</p>
             <p className="contact-info">soporte@electroshop.com</p>
           </Card>
-          
+
           <Card className="action-card">
             <h3>💬 Chat en Vivo</h3>
             <p>Conversación instantánea 24/7</p>
-            <Button variant="outline" size="sm">Iniciar Chat</Button>
+            <Button variant="outline" size="sm">
+              Iniciar Chat
+            </Button>
           </Card>
         </div>
 
@@ -64,14 +66,9 @@ export const Support = () => {
           <div className="faq-list">
             {faqs.map((faq, index) => (
               <Card key={index} className="faq-item">
-                <div 
-                  className="faq-question"
-                  onClick={() => toggleFaq(index)}
-                >
+                <div className="faq-question" onClick={() => toggleFaq(index)}>
                   <h4>{faq.question}</h4>
-                  <span className="faq-toggle">
-                    {activeFaq === index ? '−' : '+'}
-                  </span>
+                  <span className="faq-toggle">{activeFaq === index ? '−' : '+'}</span>
                 </div>
                 {activeFaq === index && (
                   <div className="faq-answer">

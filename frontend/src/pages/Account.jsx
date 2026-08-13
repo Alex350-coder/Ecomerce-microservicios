@@ -14,27 +14,27 @@ export const Account = () => {
     address: '',
     city: '',
     country: '',
-    zipCode: ''
+    zipCode: '',
   });
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   // 🆕 Estados para cambiar contraseña
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
 
   // 🆕 Cargar datos del usuario al montar el componente
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const token = localStorage.getItem('token');
-    
+
     if (token && user.id) {
       // 🆕 Obtener datos actualizados del usuario
       fetchUserData(user.id);
@@ -48,17 +48,17 @@ export const Account = () => {
     try {
       setIsLoading(true);
       const response = await fetch(`http://localhost:3001/users/profile/${userId}`);
-      
+
       if (!response.ok) {
         throw new Error('Error al cargar datos del usuario');
       }
-      
+
       const user = await response.json();
-      setUserData(prev => ({
+      setUserData((prev) => ({
         ...prev,
         firstName: user.firstName || '',
         lastName: user.lastName || '',
-        email: user.email || ''
+        email: user.email || '',
       }));
     } catch (error) {
       console.error('Error:', error);
@@ -69,9 +69,9 @@ export const Account = () => {
   };
 
   const handleChange = (field, value) => {
-    setUserData(prev => ({
+    setUserData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -81,7 +81,7 @@ export const Account = () => {
       setIsLoading(true);
       setError('');
       setSuccess('');
-      
+
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       const token = localStorage.getItem('token');
 
@@ -89,12 +89,12 @@ export const Account = () => {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           firstName: userData.firstName,
           lastName: userData.lastName,
-          email: userData.email
+          email: userData.email,
         }),
       });
 
@@ -104,16 +104,18 @@ export const Account = () => {
       }
 
       const updatedUser = await response.json();
-      
+
       // 🆕 Actualizar localStorage con nuevos datos
-      localStorage.setItem('user', JSON.stringify({
-        ...user,
-        ...updatedUser
-      }));
-      
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          ...user,
+          ...updatedUser,
+        }),
+      );
+
       setSuccess('Perfil actualizado correctamente');
       setIsEditing(false);
-      
     } catch (error) {
       console.error('Error:', error);
       setError(error.message || 'Error al actualizar perfil');
@@ -125,11 +127,11 @@ export const Account = () => {
   const handleCancel = () => {
     // 🆕 Recargar datos originales
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    setUserData(prev => ({
+    setUserData((prev) => ({
       ...prev,
       firstName: user.firstName || '',
       lastName: user.lastName || '',
-      email: user.email || ''
+      email: user.email || '',
     }));
     setIsEditing(false);
     setError('');
@@ -158,11 +160,11 @@ export const Account = () => {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword
+          newPassword: passwordData.newPassword,
         }),
       });
 
@@ -176,9 +178,8 @@ export const Account = () => {
       setPasswordData({
         currentPassword: '',
         newPassword: '',
-        confirmPassword: ''
+        confirmPassword: '',
       });
-      
     } catch (error) {
       console.error('Error:', error);
       setError(error.message || 'Error al cambiar contraseña');
@@ -199,14 +200,14 @@ export const Account = () => {
     try {
       setIsLoading(true);
       setError('');
-      
+
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       const token = localStorage.getItem('token');
 
       const response = await fetch(`http://localhost:3002/auth/${user.id}/verify-email`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -215,11 +216,10 @@ export const Account = () => {
       }
 
       setSuccess('Email verificado correctamente');
-      
+
       // Actualizar estado en localStorage
       const updatedUser = { ...user, emailVerified: true };
       localStorage.setItem('user', JSON.stringify(updatedUser));
-      
     } catch (error) {
       console.error('Error:', error);
       setError(error.message || 'Error al verificar email');
@@ -239,17 +239,9 @@ export const Account = () => {
         </div>
 
         {/* 🆕 Mensajes de éxito/error */}
-        {error && (
-          <div className="account-message error-message">
-            {error}
-          </div>
-        )}
-        
-        {success && (
-          <div className="account-message success-message">
-            {success}
-          </div>
-        )}
+        {error && <div className="account-message error-message">{error}</div>}
+
+        {success && <div className="account-message success-message">{success}</div>}
 
         <div className="account-content">
           {/* Información Personal */}
@@ -257,8 +249,8 @@ export const Account = () => {
             <div className="section-header">
               <h2>Información Personal</h2>
               {!isEditing ? (
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => setIsEditing(true)}
                   disabled={isLoading}
@@ -267,16 +259,11 @@ export const Account = () => {
                 </Button>
               ) : (
                 <div className="edit-actions">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={handleCancel}
-                    disabled={isLoading}
-                  >
+                  <Button variant="outline" size="sm" onClick={handleCancel} disabled={isLoading}>
                     Cancelar
                   </Button>
-                  <Button 
-                    variant="primary" 
+                  <Button
+                    variant="primary"
                     size="sm"
                     onClick={handleSave}
                     isLoading={isLoading}
@@ -310,12 +297,14 @@ export const Account = () => {
                   disabled={!isEditing || isLoading}
                 />
                 <div className="email-verification">
-                  <span className={`verification-status ${user.emailVerified ? 'verified' : 'not-verified'}`}>
+                  <span
+                    className={`verification-status ${user.emailVerified ? 'verified' : 'not-verified'}`}
+                  >
                     {user.emailVerified ? '✓ Email verificado' : '✗ Email no verificado'}
                   </span>
                   {!user.emailVerified && (
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={handleVerifyEmail}
                       disabled={isLoading}
@@ -333,8 +322,8 @@ export const Account = () => {
             <Card className="account-section">
               <div className="section-header">
                 <h2>Cambiar Contraseña</h2>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => setShowChangePassword(false)}
                   disabled={isLoading}
@@ -342,39 +331,45 @@ export const Account = () => {
                   Cancelar
                 </Button>
               </div>
-              
+
               <div className="password-change-form">
                 <Input
                   label="Contraseña Actual"
                   type="password"
                   value={passwordData.currentPassword}
-                  onChange={(e) => setPasswordData(prev => ({
-                    ...prev,
-                    currentPassword: e.target.value
-                  }))}
+                  onChange={(e) =>
+                    setPasswordData((prev) => ({
+                      ...prev,
+                      currentPassword: e.target.value,
+                    }))
+                  }
                   disabled={isLoading}
                 />
                 <Input
                   label="Nueva Contraseña"
                   type="password"
                   value={passwordData.newPassword}
-                  onChange={(e) => setPasswordData(prev => ({
-                    ...prev,
-                    newPassword: e.target.value
-                  }))}
+                  onChange={(e) =>
+                    setPasswordData((prev) => ({
+                      ...prev,
+                      newPassword: e.target.value,
+                    }))
+                  }
                   disabled={isLoading}
                 />
                 <Input
                   label="Confirmar Nueva Contraseña"
                   type="password"
                   value={passwordData.confirmPassword}
-                  onChange={(e) => setPasswordData(prev => ({
-                    ...prev,
-                    confirmPassword: e.target.value
-                  }))}
+                  onChange={(e) =>
+                    setPasswordData((prev) => ({
+                      ...prev,
+                      confirmPassword: e.target.value,
+                    }))
+                  }
                   disabled={isLoading}
                 />
-                <Button 
+                <Button
                   variant="primary"
                   onClick={handleChangePassword}
                   isLoading={isLoading}
@@ -391,11 +386,7 @@ export const Account = () => {
                 <div className="action-item">
                   <h3>Contraseña</h3>
                   <p>Actualiza tu contraseña de acceso regularmente</p>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setShowChangePassword(true)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setShowChangePassword(true)}>
                     Cambiar Contraseña
                   </Button>
                 </div>
@@ -414,15 +405,11 @@ export const Account = () => {
                   Ver Historial
                 </Button>
               </div>
-              
+
               <div className="action-item">
                 <h3>Cerrar Sesión</h3>
                 <p>Salir de tu cuenta de forma segura</p>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleLogout}
-                >
+                <Button variant="outline" size="sm" onClick={handleLogout}>
                   Cerrar Sesión
                 </Button>
               </div>

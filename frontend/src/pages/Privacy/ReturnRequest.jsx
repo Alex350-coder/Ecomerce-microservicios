@@ -12,15 +12,15 @@ export const ReturnRequest = () => {
     reason: '',
     description: '',
     contactEmail: '',
-    contactPhone: ''
+    contactPhone: '',
   });
 
   const [receiptFile, setReceiptFile] = useState(null);
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -35,7 +35,7 @@ export const ReturnRequest = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!receiptFile) {
       alert('Por favor, adjunta el comprobante de pago');
       return;
@@ -43,7 +43,7 @@ export const ReturnRequest = () => {
 
     console.log('Solicitud de devolución:', { ...formData, receiptFile });
     alert('Solicitud de devolución enviada. Te contactaremos en 24-48 horas.');
-    
+
     // Reset form
     setFormData({
       orderNumber: '',
@@ -51,7 +51,7 @@ export const ReturnRequest = () => {
       reason: '',
       description: '',
       contactEmail: '',
-      contactPhone: ''
+      contactPhone: '',
     });
     setReceiptFile(null);
   };
@@ -158,9 +158,7 @@ export const ReturnRequest = () => {
                     )}
                   </div>
                 </label>
-                <p className="file-help">
-                  Formato aceptado: PDF (máximo 5MB)
-                </p>
+                <p className="file-help">Formato aceptado: PDF (máximo 5MB)</p>
               </div>
             </div>
 
@@ -168,10 +166,10 @@ export const ReturnRequest = () => {
               <Button type="submit" className="submit-button">
                 Enviar Solicitud de Devolución
               </Button>
-              
+
               <p className="form-note">
-                Al enviar este formulario, aceptas nuestra 
-                <a href="/privacy"> Política de Privacidad</a> y 
+                Al enviar este formulario, aceptas nuestra
+                <a href="/privacy"> Política de Privacidad</a> y
                 <a href="/terms"> Términos de Servicio</a>.
               </p>
             </div>

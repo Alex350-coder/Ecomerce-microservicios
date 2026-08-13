@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -12,10 +18,10 @@ export class User {
   password!: string;
 
   @Column({ name: 'first_name', type: 'varchar', nullable: true, length: 100 })
-  firstName!: string | null;  // ← Permitir null
+  firstName!: string | null; // ← Permitir null
 
   @Column({ name: 'last_name', type: 'varchar', nullable: true, length: 100 })
-  lastName!: string | null;   // ← Permitir null
+  lastName!: string | null; // ← Permitir null
 
   @Column({ type: 'varchar', default: 'user', length: 20 })
   role!: string;
@@ -27,19 +33,19 @@ export class User {
   emailVerified!: boolean;
 
   @Column({ name: 'reset_token', type: 'varchar', nullable: true, length: 500 })
-  resetToken!: string | null;  // ← Permitir null
+  resetToken!: string | null; // ← Permitir null
 
   @Column({ name: 'reset_token_expires', type: 'datetime', nullable: true })
-  resetTokenExpires!: Date | null;  // ← Permitir null
+  resetTokenExpires!: Date | null; // ← Permitir null
 
   @Column({ name: 'login_attempts', type: 'int', default: 0 })
   loginAttempts!: number;
 
   @Column({ name: 'locked_until', type: 'datetime', nullable: true })
-  lockedUntil!: Date | null;  // ← Permitir null
+  lockedUntil!: Date | null; // ← Permitir null
 
   @Column({ name: 'last_login', type: 'datetime', nullable: true })
-  lastLogin!: Date | null;  // ← Permitir null
+  lastLogin!: Date | null; // ← Permitir null
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

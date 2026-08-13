@@ -16,18 +16,17 @@ export const About = () => {
           <Card className="about-section">
             <h2>Nuestra Historia</h2>
             <p>
-              ElectroShop nació en 2020 con la visión de revolucionar la forma en que 
-              las personas compran tecnología. Empezamos como una pequeña tienda online 
-              y hoy somos líderes en venta de productos electrónicos en Latinoamérica.
+              ElectroShop nació en 2020 con la visión de revolucionar la forma en que las personas
+              compran tecnología. Empezamos como una pequeña tienda online y hoy somos líderes en
+              venta de productos electrónicos en Latinoamérica.
             </p>
           </Card>
 
           <Card className="about-section">
             <h2>Nuestra Misión</h2>
             <p>
-              Hacer la tecnología accesible para todos, ofreciendo productos de calidad 
-              a precios competitivos, con un servicio al cliente excepcional y envíos 
-              rápidos a todo el país.
+              Hacer la tecnología accesible para todos, ofreciendo productos de calidad a precios
+              competitivos, con un servicio al cliente excepcional y envíos rápidos a todo el país.
             </p>
           </Card>
 

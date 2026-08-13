@@ -9,24 +9,17 @@ export const CartIcon = () => {
 
   return (
     <>
-      <Button 
-        variant="ghost" 
-        size="sm" 
+      <Button
+        variant="ghost"
+        size="sm"
         className="cart-icon-button"
         onClick={() => setIsCartOpen(true)}
       >
         🛒
-        {itemCount > 0 && (
-          <span className="cart-badge">
-            {itemCount}
-          </span>
-        )}
+        {itemCount > 0 && <span className="cart-badge">{itemCount}</span>}
       </Button>
 
-      <CartDropdown 
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-      />
+      <CartDropdown isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 };

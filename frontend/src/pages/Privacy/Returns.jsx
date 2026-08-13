@@ -17,12 +17,12 @@ export const Returns = () => {
         <div className="returns-content">
           <Card className="policy-card">
             <h2>📦 Política de Devoluciones</h2>
-            
+
             <div className="policy-section">
               <h3>Plazo para Devoluciones</h3>
               <p>
-                Aceptamos devoluciones dentro de los <strong>30 días</strong> posteriores 
-                a la recepción del producto.
+                Aceptamos devoluciones dentro de los <strong>30 días</strong> posteriores a la
+                recepción del producto.
               </p>
             </div>
 
@@ -39,9 +39,9 @@ export const Returns = () => {
             <div className="policy-section">
               <h3>Proceso de Reembolso</h3>
               <p>
-                Una vez recibido y verificado el producto, procesaremos tu reembolso 
-                dentro de <strong>5-7 días hábiles</strong>. El reembolso se realizará 
-                al método de pago original.
+                Una vez recibido y verificado el producto, procesaremos tu reembolso dentro de{' '}
+                <strong>5-7 días hábiles</strong>. El reembolso se realizará al método de pago
+                original.
               </p>
             </div>
 
@@ -61,12 +61,12 @@ export const Returns = () => {
                   Solicitar Devolución
                 </Button>
               </Link>
-              
+
               <Link to="/contact">
-              <p className="contact-info">
-                ¿Tienes dudas? Contáctanos: 
-                <strong> devoluciones@electroshop.com</strong>
-              </p>
+                <p className="contact-info">
+                  ¿Tienes dudas? Contáctanos:
+                  <strong> devoluciones@electroshop.com</strong>
+                </p>
               </Link>
             </div>
           </Card>

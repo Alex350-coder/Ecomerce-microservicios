@@ -29,9 +29,18 @@ export class AuthService {
       throw new UnauthorizedException('Cuenta temporalmente bloqueada. Intenta más tarde.');
     }
 
-    const user = await this.usersRepository.findOne({ 
+    const user = await this.usersRepository.findOne({
       where: { email },
-      select: ['id', 'email', 'password', 'firstName', 'lastName', 'role', 'isActive', 'emailVerified']
+      select: [
+        'id',
+        'email',
+        'password',
+        'firstName',
+        'lastName',
+        'role',
+        'isActive',
+        'emailVerified',
+      ],
     });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -45,7 +54,7 @@ export class AuthService {
     await this.usersRepository.save(user);
 
     const payload = { email: user.email, sub: user.id, role: user.role };
-    
+
     return {
       access_token: this.jwtService.sign(payload),
       user: {
@@ -59,10 +68,13 @@ export class AuthService {
     };
   }
 
-  async changePassword(id: string, changePasswordDto: ChangePasswordDto): Promise<{ message: string }> {
-    const user = await this.usersRepository.findOne({ 
+  async changePassword(
+    id: string,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    const user = await this.usersRepository.findOne({
       where: { id },
-      select: ['id', 'password'] 
+      select: ['id', 'password'],
     });
 
     if (!user) {
@@ -71,7 +83,7 @@ export class AuthService {
 
     const isCurrentPasswordValid = await bcrypt.compare(
       changePasswordDto.currentPassword,
-      user.password
+      user.password,
     );
 
     if (!isCurrentPasswordValid) {
@@ -86,14 +98,15 @@ export class AuthService {
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<{ message: string }> {
     const user = await this.usersRepository.findOne({
-      where: { email: forgotPasswordDto.email }
+      where: { email: forgotPasswordDto.email },
     });
-    
+
     if (!user) {
       return { message: 'Si el email existe, se enviarán instrucciones de recuperación' };
     }
 
-    const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const resetToken =
+      Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const resetTokenExpires = new Date();
     resetTokenExpires.setHours(resetTokenExpires.getHours() + 1);
 
@@ -108,10 +121,10 @@ export class AuthService {
 
   async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<{ message: string }> {
     const user = await this.usersRepository.findOne({
-      where: { 
+      where: {
         resetToken: resetPasswordDto.token,
-        resetTokenExpires: MoreThan(new Date())
-      }
+        resetTokenExpires: MoreThan(new Date()),
+      },
     });
 
     if (!user) {
@@ -119,13 +132,13 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(resetPasswordDto.newPassword, 12);
-    
+
     user.password = hashedPassword;
     user.resetToken = null;
     user.resetTokenExpires = null;
     user.loginAttempts = 0;
     user.lockedUntil = null;
-    
+
     await this.usersRepository.save(user);
 
     return { message: 'Contraseña restablecida correctamente' };
@@ -133,7 +146,7 @@ export class AuthService {
 
   async initiateEmailVerification(id: string): Promise<{ message: string }> {
     const user = await this.usersRepository.findOne({ where: { id } });
-    
+
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }
@@ -148,7 +161,7 @@ export class AuthService {
 
   async verifyEmail(id: string): Promise<{ message: string }> {
     const user = await this.usersRepository.findOne({ where: { id } });
-    
+
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }
@@ -168,7 +181,7 @@ export class AuthService {
     if (!user) return;
 
     user.loginAttempts += 1;
-    
+
     if (user.loginAttempts >= 5) {
       const lockTime = new Date();
       lockTime.setMinutes(lockTime.getMinutes() + 15);
@@ -179,9 +192,9 @@ export class AuthService {
   }
 
   async resetLoginAttempts(userId: string): Promise<void> {
-    await this.usersRepository.update(userId, { 
-      loginAttempts: 0, 
-      lockedUntil: null 
+    await this.usersRepository.update(userId, {
+      loginAttempts: 0,
+      lockedUntil: null,
     });
   }
 
@@ -199,7 +212,7 @@ export class AuthService {
 
   async unlockAccount(id: string): Promise<{ message: string }> {
     const user = await this.usersRepository.findOne({ where: { id } });
-    
+
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }

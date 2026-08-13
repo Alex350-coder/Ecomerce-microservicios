@@ -13,7 +13,7 @@ export const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    acceptTerms: false
+    acceptTerms: false,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -23,9 +23,9 @@ export const Register = () => {
   const navigate = useNavigate();
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
     // Limpiar mensajes cuando el usuario empiece a escribir
     if (error) setError('');
@@ -33,14 +33,10 @@ export const Register = () => {
   };
 
   // 🆕 Verificar si el email ya existe antes de registrar
-  const checkEmailExists = async (email) => {
-    try {
-      // En un sistema completo, aquí harías una petición para verificar
-      // Por ahora simulamos que no existe
-      return false;
-    } catch (error) {
-      return false;
-    }
+  const checkEmailExists = async () => {
+    // En un sistema completo, aquí harías una petición para verificar
+    // Por ahora simulamos que no existe
+    return false;
   };
 
   // 🆕 Iniciar verificación de email
@@ -91,7 +87,7 @@ export const Register = () => {
     setIsLoading(true);
     setError('');
     setSuccess('');
-    
+
     // Validaciones mejoradas
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
@@ -135,7 +131,7 @@ export const Register = () => {
           email: formData.email,
           password: formData.password,
           firstName: formData.firstName,
-          lastName: formData.lastName
+          lastName: formData.lastName,
         }),
       });
 
@@ -157,14 +153,13 @@ export const Register = () => {
       // 🆕 Registro exitoso - nuevas funcionalidades
       console.log('Usuario registrado:', data);
       setRegisteredUserId(data.id);
-      
+
       // 🆕 Mostrar opción de verificación de email
       setShowEmailVerification(true);
       setSuccess('¡Cuenta creada exitosamente! ');
-      
+
       // 🆕 Iniciar verificación de email automáticamente
       await initiateEmailVerification(data.id);
-
     } catch (error) {
       console.error('Error en registro:', error);
       setError(error.message || 'Error al crear la cuenta. Intenta nuevamente.');
@@ -175,15 +170,15 @@ export const Register = () => {
 
   // 🆕 Navegar al login
   const handleGoToLogin = () => {
-    navigate('/login', { 
-      state: { message: 'Cuenta creada exitosamente. Ahora puedes iniciar sesión.' } 
+    navigate('/login', {
+      state: { message: 'Cuenta creada exitosamente. Ahora puedes iniciar sesión.' },
     });
   };
 
   // 🆕 Reenviar verificación de email
   const handleResendVerification = async () => {
     if (!registeredUserId) return;
-    
+
     setIsLoading(true);
     setError('');
     await initiateEmailVerification(registeredUserId);
@@ -209,16 +204,16 @@ export const Register = () => {
             {showEmailVerification && (
               <div className="verification-actions">
                 <p>¿No recibiste el email?</p>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="resend-button"
                   onClick={handleResendVerification}
                   disabled={isLoading}
                 >
                   {isLoading ? 'Enviando...' : 'Reenviar verificación'}
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="verify-now-button"
                   onClick={() => verifyEmail(registeredUserId)}
                   disabled={isLoading}
@@ -265,7 +260,7 @@ export const Register = () => {
                   disabled={isLoading}
                 />
               </div>
-              
+
               <Input
                 label="Correo Electrónico"
                 type="email"
@@ -275,7 +270,7 @@ export const Register = () => {
                 required
                 disabled={isLoading}
               />
-              
+
               <Input
                 label="Contraseña"
                 type="password"
@@ -286,7 +281,7 @@ export const Register = () => {
                 disabled={isLoading}
                 minLength={6}
               />
-              
+
               <Input
                 label="Confirmar Contraseña"
                 type="password"
@@ -297,7 +292,7 @@ export const Register = () => {
                 disabled={isLoading}
                 minLength={6}
               />
-              
+
               <div className="terms-options">
                 <label className="accept-terms">
                   <input
@@ -311,8 +306,8 @@ export const Register = () => {
                 </label>
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="register-button"
                 isLoading={isLoading}
                 disabled={isLoading}
@@ -326,17 +321,16 @@ export const Register = () => {
         {/* 🆕 Acciones después del registro exitoso */}
         {showEmailVerification && (
           <div className="post-registration-actions">
-            <Button 
-              onClick={handleGoToLogin}
-              className="login-button"
-            >
+            <Button onClick={handleGoToLogin} className="login-button">
               Ir a Iniciar Sesión
             </Button>
           </div>
         )}
 
         <div className="register-footer">
-          <p>¿Ya tienes una cuenta? <Link to="/login">Inicia sesión aquí</Link></p>
+          <p>
+            ¿Ya tienes una cuenta? <Link to="/login">Inicia sesión aquí</Link>
+          </p>
         </div>
       </Card>
     </AuthLayout>

@@ -12,21 +12,21 @@ export const CartDropdown = ({ isOpen, onClose, cartItems }) => {
       name: 'iPhone 14 Pro',
       price: 999,
       quantity: 1,
-      image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=100&h=100&fit=crop'
+      image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=100&h=100&fit=crop',
     },
     {
       id: 2,
       name: 'AirPods Pro',
       price: 249,
       quantity: 2,
-      image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=100&h=100&fit=crop'
-    }
+      image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=100&h=100&fit=crop',
+    },
   ];
 
   const items = cartItems || sampleItems;
-  
+
   const calculateTotal = () => {
-    return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return items.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
   if (!isOpen) return null;
@@ -37,7 +37,9 @@ export const CartDropdown = ({ isOpen, onClose, cartItems }) => {
         {/* Header */}
         <div className="cart-header">
           <h3>Carrito de Compras</h3>
-          <button className="close-button" onClick={onClose}>×</button>
+          <button className="close-button" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         {/* Lista de Productos */}
@@ -60,9 +62,7 @@ export const CartDropdown = ({ isOpen, onClose, cartItems }) => {
                       <span>Cantidad: {item.quantity}</span>
                     </div>
                   </div>
-                  <div className="item-total">
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </div>
+                  <div className="item-total">${(item.price * item.quantity).toFixed(2)}</div>
                 </Card>
               ))}
             </div>
@@ -81,11 +81,10 @@ export const CartDropdown = ({ isOpen, onClose, cartItems }) => {
                 Seguir Comprando
               </Button>
               <Link to="/Checkout">
-              <Button variant="primary" size="sm">
-                Proceder al Pago
-              </Button>
+                <Button variant="primary" size="sm">
+                  Proceder al Pago
+                </Button>
               </Link>
-              
             </div>
           </div>
         )}

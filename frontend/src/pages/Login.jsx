@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AuthLayout } from '../templates/AuthLayout';  
+import { AuthLayout } from '../templates/AuthLayout';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card } from '../components/ui/Card';
@@ -48,10 +48,9 @@ export const Login = () => {
 
       setSuccess('Si el email existe, se enviarán instrucciones de recuperación');
       setShowForgotPassword(false);
-      
+
       // 🆕 Mostrar instrucciones para usar el token (en desarrollo)
       console.log('En producción se enviaría un email. Token de desarrollo:', data.debugToken);
-
     } catch (error) {
       console.error('Error en recuperación:', error);
       setError(error.message || 'Error al procesar la solicitud');
@@ -73,9 +72,9 @@ export const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          token: resetToken, 
-          newPassword: newPassword 
+        body: JSON.stringify({
+          token: resetToken,
+          newPassword: newPassword,
         }),
       });
 
@@ -89,7 +88,6 @@ export const Login = () => {
       setShowResetPassword(false);
       setResetToken('');
       setNewPassword('');
-
     } catch (error) {
       console.error('Error en restablecimiento:', error);
       setError(error.message || 'Token inválido o expirado');
@@ -104,7 +102,7 @@ export const Login = () => {
     setIsLoading(true);
     setError('');
     setSuccess('');
-    
+
     try {
       const response = await fetch('http://localhost:3002/auth/login', {
         method: 'POST',
@@ -120,7 +118,9 @@ export const Login = () => {
         // 🆕 Manejo específico de errores
         if (response.status === 401) {
           if (data.message?.includes('bloqueada')) {
-            setError('Cuenta temporalmente bloqueada por múltiples intentos fallidos. Intenta en 15 minutos.');
+            setError(
+              'Cuenta temporalmente bloqueada por múltiples intentos fallidos. Intenta en 15 minutos.',
+            );
           } else {
             setError('Credenciales inválidas. Verifica tu email y contraseña.');
           }
@@ -135,21 +135,20 @@ export const Login = () => {
 
       // 🆕 Login exitoso - mejorado
       console.log('Login exitoso:', data);
-      
+
       // Guardar token y datos de usuario
       localStorage.setItem('token', data.access_token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      
+
       // 🆕 Verificar si el email está verificado
       if (!data.user.emailVerified) {
         setSuccess('¡Bienvenido! Tu email no está verificado. Te recomendamos verificarlo.');
       }
-      
+
       // Redirigir al dashboard después de un breve delay
       setTimeout(() => {
         navigate('/');
       }, 1500);
-
     } catch (error) {
       console.error('Error en login:', error);
       setError(error.message || 'Error de conexión. Intenta nuevamente.');
@@ -182,25 +181,17 @@ export const Login = () => {
         </div>
 
         {/* 🆕 MENSAJES DE ÉXITO/ERROR */}
-        {successMessage && (
-          <div className="success-message">
-            {successMessage}
-          </div>
-        )}
+        {successMessage && <div className="success-message">{successMessage}</div>}
 
-        {success && (
-          <div className="success-message">
-            {success}
-          </div>
-        )}
+        {success && <div className="success-message">{success}</div>}
 
         {error && (
           <div className="error-message">
             {error}
             {error.includes('bloqueada') && (
               <div className="error-actions">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="text-link"
                   onClick={() => setShowForgotPassword(true)}
                 >
@@ -223,7 +214,7 @@ export const Login = () => {
               required
               disabled={isLoading}
             />
-            
+
             <Input
               label="Contraseña"
               type={showPassword ? 'text' : 'password'}
@@ -233,7 +224,7 @@ export const Login = () => {
               required
               disabled={isLoading}
             />
-            
+
             <div className="password-options">
               <label className="show-password">
                 <input
@@ -244,9 +235,9 @@ export const Login = () => {
                 />
                 Mostrar contraseña
               </label>
-              
-              <button 
-                type="button" 
+
+              <button
+                type="button"
                 className="forgot-password"
                 onClick={() => setShowForgotPassword(true)}
                 disabled={isLoading}
@@ -255,8 +246,8 @@ export const Login = () => {
               </button>
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="login-button"
               isLoading={isLoading}
               disabled={isLoading}
@@ -271,7 +262,7 @@ export const Login = () => {
           <div className="recovery-form">
             <h3>Recuperar Contraseña</h3>
             <p>Ingresa tu email y te enviaremos instrucciones de recuperación</p>
-            
+
             <form onSubmit={handleForgotPassword}>
               <Input
                 label="Correo Electrónico"
@@ -282,19 +273,19 @@ export const Login = () => {
                 required
                 disabled={isLoading}
               />
-              
+
               <div className="recovery-actions">
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="recovery-button"
                   isLoading={isLoading}
                   disabled={isLoading}
                 >
                   {isLoading ? 'Enviando...' : 'Enviar Instrucciones'}
                 </Button>
-                
-                <button 
-                  type="button" 
+
+                <button
+                  type="button"
                   className="back-button"
                   onClick={closeModals}
                   disabled={isLoading}
@@ -302,8 +293,8 @@ export const Login = () => {
                   Volver al Login
                 </button>
 
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="text-link"
                   onClick={() => {
                     setShowForgotPassword(false);
@@ -322,7 +313,7 @@ export const Login = () => {
           <div className="reset-form">
             <h3>Restablecer Contraseña</h3>
             <p>Ingresa el token que recibiste y tu nueva contraseña</p>
-            
+
             <form onSubmit={handleResetPassword}>
               <Input
                 label="Token de Recuperación"
@@ -333,7 +324,7 @@ export const Login = () => {
                 required
                 disabled={isLoading}
               />
-              
+
               <Input
                 label="Nueva Contraseña"
                 type="password"
@@ -344,19 +335,19 @@ export const Login = () => {
                 disabled={isLoading}
                 minLength={6}
               />
-              
+
               <div className="reset-actions">
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="reset-button"
                   isLoading={isLoading}
                   disabled={isLoading}
                 >
                   {isLoading ? 'Restableciendo...' : 'Restablecer Contraseña'}
                 </Button>
-                
-                <button 
-                  type="button" 
+
+                <button
+                  type="button"
                   className="back-button"
                   onClick={closeModals}
                   disabled={isLoading}
@@ -369,7 +360,9 @@ export const Login = () => {
         )}
 
         <div className="login-footer">
-          <p>¿No tienes una cuenta?  <Link to="/register">Regístrate aquí</Link></p>
+          <p>
+            ¿No tienes una cuenta? <Link to="/register">Regístrate aquí</Link>
+          </p>
         </div>
       </Card>
     </AuthLayout>

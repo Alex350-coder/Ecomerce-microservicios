@@ -10,13 +10,13 @@ export const Contact = () => {
     name: '',
     email: '',
     subject: '',
-    message: ''
+    message: '',
   });
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -39,23 +39,23 @@ export const Contact = () => {
           <div className="contact-info">
             <Card className="info-card">
               <h2>Información de Contacto</h2>
-              
+
               <div className="contact-method">
                 <h3>📧 Email</h3>
                 <p>soporte@electroshop.com</p>
               </div>
-              
+
               <div className="contact-method">
                 <h3>📞 Teléfono</h3>
                 <p>+1 (555) 123-4567</p>
               </div>
-              
+
               <div className="contact-method">
                 <h3>🕒 Horario de Atención</h3>
                 <p>Lunes a Viernes: 9:00 - 18:00</p>
                 <p>Sábados: 10:00 - 14:00</p>
               </div>
-              
+
               <div className="contact-method">
                 <h3>🏢 Dirección</h3>
                 <p>Calle Tecnología 123</p>
@@ -67,7 +67,7 @@ export const Contact = () => {
           <div className="contact-form">
             <Card className="form-card">
               <h2>Envíanos un Mensaje</h2>
-              
+
               <form onSubmit={handleSubmit}>
                 <div className="form-grid">
                   <Input
@@ -84,14 +84,14 @@ export const Contact = () => {
                     required
                   />
                 </div>
-                
+
                 <Input
                   label="Asunto"
                   value={formData.subject}
                   onChange={(e) => handleChange('subject', e.target.value)}
                   required
                 />
-                
+
                 <div className="input-container">
                   <label>Mensaje</label>
                   <textarea
@@ -102,7 +102,7 @@ export const Contact = () => {
                     className="message-textarea"
                   />
                 </div>
-                
+
                 <Button type="submit" className="submit-button">
                   Enviar Mensaje
                 </Button>
