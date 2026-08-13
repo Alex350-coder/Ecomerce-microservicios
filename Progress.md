@@ -34,3 +34,5 @@ Estado real por fase del plan `Planning_files/04-ROADMAP.md`. Única fuente de e
 - [x] README raíz esqueleto + este `Progress.md`
 
 **Criterios de aceptación (verificados 2026-08-13):** `git status` limpio; `npm run build` OK en frontend y auth-service; `npm audit` 0 vulnerabilidades en ambos paquetes; sin `yarn.lock`; sin carpetas anidadas; sin `package.json` obsoleto; sin secretos en código; 1 lockfile por paquete.
+
+**Deuda documentada (preexistente, fuera del alcance de F0):** `eslint` de auth-service reporta 13 errores `@typescript-eslint/no-unsafe-*` y 1 warning `no-floating-promises` en código existente. La config de lint quedó unificada en F0, pero los fixes de tipado son parte de la fase F4 (Auth a producción). Frontend: lint sin errores (G5 OK).
