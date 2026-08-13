@@ -1,0 +1,5 @@
+# Normalizar fin de línea: LF en el repo, checkout según plataforma
+* text=auto
+
+# Scripts shell SIEMPRE LF (contenedores Linux)
+*.sh text eol=lf
