@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -16,12 +17,15 @@ import { AuthModule } from './auth/auth.module';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true,
-        logging: true,
+        synchronize:
+          configService.get('NODE_ENV') !== 'production' &&
+          configService.get('DB_SYNCHRONIZE') === 'true',
+        logging: configService.get('NODE_ENV') !== 'production',
       }),
       inject: [ConfigService],
     }),
     AuthModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
