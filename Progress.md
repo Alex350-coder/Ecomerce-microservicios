@@ -8,7 +8,7 @@ Estado real por fase del plan `Planning_files/04-ROADMAP.md`. Única fuente de e
 
 | Fase | Descripción | Estado |
 |------|-------------|--------|
-| F0 | Higiene del repositorio y tooling | En curso |
+| F0 | Higiene del repositorio y tooling | DONE (2026-08-13) |
 | F1 | Plataforma base (Docker, MySQL, shells, CI esqueleto) | Pendiente |
 | F2 | Gateway API | Pendiente |
 | F3 | Base frontend | Pendiente |
@@ -33,4 +33,4 @@ Estado real por fase del plan `Planning_files/04-ROADMAP.md`. Única fuente de e
 - [x] `index.html` con título/meta de ElectroShop
 - [x] README raíz esqueleto + este `Progress.md`
 
-**Criterios de aceptación (verificación pendiente):** `git status` limpio; `npm install` + `npm run build` en frontend; auth-service compila; sin `yarn.lock`; sin carpetas anidadas; sin `package.json` obsoleto.
+**Criterios de aceptación (verificados 2026-08-13):** `git status` limpio; `npm run build` OK en frontend y auth-service; `npm audit` 0 vulnerabilidades en ambos paquetes; sin `yarn.lock`; sin carpetas anidadas; sin `package.json` obsoleto; sin secretos en código; 1 lockfile por paquete.
