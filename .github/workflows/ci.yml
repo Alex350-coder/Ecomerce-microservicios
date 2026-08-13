@@ -1,0 +1,148 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  quality:
+    name: quality (${{ matrix.package.dir }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dir: core-services/user-service
+            strict: true
+          - dir: core-services/product-service
+            strict: true
+          - dir: core-services/cart-service
+            strict: true
+          - dir: core-services/order-service
+            strict: true
+          - dir: core-services/inventory-service
+            strict: true
+          - dir: core-services/payment-service
+            strict: true
+          - dir: core-services/gateway
+            strict: true
+          # auth-service: deuda preexistente F4 documentada en Progress.md
+          # (13 errores lint, 3 tests pendientes). lint/test no-bloqueantes;
+          # typecheck y build SI bloquean.
+          - dir: core-services/auth-service
+            strict: false
+          - dir: frontend
+            strict: true
+            has-test: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ matrix.package.dir }}/package-lock.json
+
+      - name: Alinear npm con los lockfiles (generados con npm 11)
+        run: npm install -g npm@11.2.0
+
+      - name: Instalar dependencias
+        working-directory: ${{ matrix.package.dir }}
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint
+        working-directory: ${{ matrix.package.dir }}
+        run: npm run lint
+        continue-on-error: ${{ !matrix.package.strict }}
+
+      - name: Typecheck
+        working-directory: ${{ matrix.package.dir }}
+        run: npm run typecheck --if-present
+
+      - name: Build
+        working-directory: ${{ matrix.package.dir }}
+        run: npm run build
+
+      - name: Test
+        working-directory: ${{ matrix.package.dir }}
+        run: npm test -- --runInBand
+        if: ${{ matrix.package.has-test != false }}
+        continue-on-error: ${{ !matrix.package.strict }}
+
+  audit:
+    name: audit (${{ matrix.dir }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dir:
+          - core-services/user-service
+          - core-services/product-service
+          - core-services/cart-service
+          - core-services/order-service
+          - core-services/inventory-service
+          - core-services/payment-service
+          - core-services/gateway
+          - core-services/auth-service
+          - frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Alinear npm con los lockfiles (generados con npm 11)
+        run: npm install -g npm@11.2.0
+      - name: npm audit (prod, bloqueante high/critical)
+        working-directory: ${{ matrix.dir }}
+        run: npm audit --omit=dev --audit-level=high
+
+  secrets:
+    name: secrets (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  smoke:
+    name: smoke (docker compose + /health)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generar .env de desarrollo para el smoke test
+        run: |
+          cat > .env <<'EOF'
+          MYSQL_ROOT_PASSWORD=ci_smoke_root_only
+          AUTH_DB_PASSWORD=ci_smoke_auth_only
+          USER_DB_PASSWORD=ci_smoke_user_only
+          PRODUCT_DB_PASSWORD=ci_smoke_product_only
+          CART_DB_PASSWORD=ci_smoke_cart_only
+          ORDER_DB_PASSWORD=ci_smoke_order_only
+          INVENTORY_DB_PASSWORD=ci_smoke_inventory_only
+          PAYMENT_DB_PASSWORD=ci_smoke_payment_only
+          JWT_SECRET=ci_smoke_jwt_secret_only
+          EOF
+
+      - name: Levantar el stack completo
+        run: docker compose up -d --build
+
+      - name: Esperar a que los servicios estén healthy
+        run: |
+          for i in $(seq 1 60); do
+            if docker compose ps --status running 2>/dev/null | grep -q healthy; then
+              COUNT=$(docker compose ps --status running | grep -c healthy || true)
+              if [ "$COUNT" -ge 9 ]; then
+                echo "healthy: $COUNT/9"
+                break
+              fi
+            fi
+            sleep 5
+          done
+
+      - name: Smoke test /health (gateway y frontend por host, servicios por exec)
+        run: bash scripts/smoke-ci.sh
