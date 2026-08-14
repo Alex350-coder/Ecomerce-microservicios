@@ -6,4 +6,19 @@ describe('JwtStrategy', () => {
     const configService = { get: () => 'test-secret' } as unknown as ConfigService;
     expect(new JwtStrategy(configService)).toBeDefined();
   });
+
+  describe('validate', () => {
+    it('maps the JWT payload to a request user', async () => {
+      const configService = { get: () => 'test-secret' } as unknown as ConfigService;
+      const strategy = new JwtStrategy(configService);
+
+      const result = await strategy.validate({
+        sub: 'user-1',
+        email: 'ana@example.com',
+        role: 'customer',
+      });
+
+      expect(result).toEqual({ userId: 'user-1', email: 'ana@example.com', role: 'customer' });
+    });
+  });
 });
