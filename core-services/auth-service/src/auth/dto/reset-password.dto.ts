@@ -1,5 +1,4 @@
-// src/users/dto/reset-password.dto.ts
-import { IsString, MinLength } from 'class-validator';
+import { IsString, MaxLength, MinLength } from 'class-validator';
 
 export class ResetPasswordDto {
   @IsString()
@@ -7,6 +6,7 @@ export class ResetPasswordDto {
   token!: string;
 
   @IsString()
-  @MinLength(6, { message: 'La nueva contraseña debe tener al menos 6 caracteres' })
+  @MinLength(8, { message: 'La nueva contraseña debe tener al menos 8 caracteres' })
+  @MaxLength(72, { message: 'La contraseña no puede superar los 72 caracteres' })
   newPassword!: string;
 }

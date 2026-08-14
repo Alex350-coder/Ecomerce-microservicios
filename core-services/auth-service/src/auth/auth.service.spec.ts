@@ -63,6 +63,14 @@ describe('AuthService', () => {
   let userSync: UserSyncService;
 
   beforeEach(() => {
+    baseUser.loginAttempts = 0;
+    baseUser.lockedUntil = null;
+    baseUser.resetToken = null;
+    baseUser.resetTokenExpires = null;
+    baseUser.lastLogin = null;
+    baseUser.emailVerified = false;
+    baseUser.isActive = true;
+
     userRepo = createMockRepo<User>();
     refreshRepo = createMockRepo<RefreshToken>();
     jwtService = { sign: jest.fn().mockReturnValue('signed-token') } as unknown as JwtService;
@@ -106,7 +114,7 @@ describe('AuthService', () => {
 
       expect(result.user.role).toBe('customer');
       expect(result.user.email).toBe('ana@example.com');
-      expect(result.user.password).toBeUndefined();
+      expect((result.user as unknown as Record<string, unknown>).password).toBeUndefined();
       const saved = userRepo.save.mock.calls[0][0] as User;
       expect(saved.password).toBe('hashed-password');
       expect(saved.password).not.toBe('password123');
@@ -135,7 +143,7 @@ describe('AuthService', () => {
     it('tolerates a failure when syncing the user to user-service', async () => {
       userRepo.findOne.mockResolvedValue(null);
       userRepo.save.mockImplementation(async (user: User) => ({ ...user, id: 'user-1' }));
-      userSync.notifyUserCreated.mockRejectedValue(new Error('network down'));
+      (userSync.notifyUserCreated as jest.Mock).mockRejectedValue(new Error('network down'));
 
       await expect(service.register(dto)).resolves.toBeDefined();
     });
@@ -151,7 +159,7 @@ describe('AuthService', () => {
 
       expect(result.accessToken).toBe('signed-token');
       expect(result.user.email).toBe('ana@example.com');
-      expect(result.user.password).toBeUndefined();
+      expect((result.user as unknown as Record<string, unknown>).password).toBeUndefined();
       expect(result.refreshToken).toMatch(/^[a-f0-9]{64}$/);
       expect(refreshRepo.save).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -166,9 +174,7 @@ describe('AuthService', () => {
       userRepo.findOne.mockResolvedValue(baseUser);
 
       await expect(service.login(dto)).rejects.toBeInstanceOf(UnauthorizedException);
-      expect(userRepo.save).toHaveBeenCalledWith(
-        expect.objectContaining({ loginAttempts: 1 }),
-      );
+      expect(userRepo.save).toHaveBeenCalledWith(expect.objectContaining({ loginAttempts: 1 }));
     });
 
     it('rejects unknown email', async () => {
@@ -247,9 +253,7 @@ describe('AuthService', () => {
     it('rejects an unknown token without side effects', async () => {
       refreshRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.refresh('unknown-token')).rejects.toBeInstanceOf(
-        UnauthorizedException,
-      );
+      await expect(service.refresh('unknown-token')).rejects.toBeInstanceOf(UnauthorizedException);
       expect(refreshRepo.update).not.toHaveBeenCalled();
       expect(refreshRepo.save).not.toHaveBeenCalled();
     });
@@ -297,9 +301,9 @@ describe('AuthService', () => {
       expect(user.id).toBe('user-1');
       expect(user.email).toBe('ana@example.com');
       expect(user.role).toBe('customer');
-      expect(user.password).toBeUndefined();
-      expect(user.resetToken).toBeUndefined();
-      expect(user.loginAttempts).toBeUndefined();
+      expect((user as unknown as Record<string, unknown>).password).toBeUndefined();
+      expect((user as unknown as Record<string, unknown>).resetToken).toBeUndefined();
+      expect((user as unknown as Record<string, unknown>).loginAttempts).toBeUndefined();
     });
 
     it('throws when the user does not exist', async () => {
@@ -357,7 +361,7 @@ describe('AuthService', () => {
       const saved = userRepo.save.mock.calls[0][0] as User;
       expect(saved.resetToken).toBeDefined();
       expect(saved.resetToken).toMatch(/^[a-f0-9]{64}$/);
-      expect(saved.resetToken).not.toBe(baseUser.resetToken);
+      expect(saved.resetToken).toHaveLength(64);
       expect(result.message).toContain('Si el email existe');
     });
 

@@ -1,4 +1,5 @@
 import { Response, Request } from 'express';
+import { ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -21,7 +22,7 @@ function createMockService() {
     initiateEmailVerification: jest.fn(),
     verifyEmail: jest.fn(),
     unlockAccount: jest.fn(),
-  } as unknown as AuthService;
+  };
 }
 
 function createMockRes() {
@@ -34,10 +35,14 @@ function createMockRes() {
 describe('AuthController', () => {
   let controller: AuthController;
   let service: ReturnType<typeof createMockService>;
+  let configService: ConfigService;
 
   beforeEach(() => {
     service = createMockService();
-    controller = new AuthController(service);
+    configService = {
+      get: jest.fn((key: string) => (key === 'NODE_ENV' ? 'test' : undefined)),
+    } as unknown as ConfigService;
+    controller = new AuthController(service as unknown as AuthService, configService);
   });
 
   describe('POST /auth/register', () => {
@@ -92,7 +97,11 @@ describe('AuthController', () => {
 
       expect(service.refresh).toHaveBeenCalledWith('old-refresh');
       expect(result).toEqual({ accessToken: 'new-access' });
-      expect(res.cookie).toHaveBeenCalledWith(REFRESH_COOKIE_NAME, 'new-refresh', expect.any(Object));
+      expect(res.cookie).toHaveBeenCalledWith(
+        REFRESH_COOKIE_NAME,
+        'new-refresh',
+        expect.any(Object),
+      );
     });
   });
 
