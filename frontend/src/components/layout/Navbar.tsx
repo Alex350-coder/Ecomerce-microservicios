@@ -1,6 +1,5 @@
-import React from 'react';
-import { Button } from '../ui/Button';
 import { Link } from 'react-router-dom';
+import { Button } from '../ui/Button';
 import '../../styles/layout/Navbar.css';
 
 export const Navbar = () => {

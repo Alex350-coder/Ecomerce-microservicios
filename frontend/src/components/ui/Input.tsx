@@ -1,5 +1,11 @@
-import React from 'react';
+import type { InputHTMLAttributes, ReactNode } from 'react';
 import '../../styles/ui/Input.css';
+
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  id?: string;
+  label?: ReactNode;
+  className?: string;
+}
 
 export const Input = ({
   type = 'text',
@@ -10,7 +16,7 @@ export const Input = ({
   id,
   label,
   ...props
-}) => {
+}: InputProps) => {
   return (
     <div className="input-container">
       {label && (
