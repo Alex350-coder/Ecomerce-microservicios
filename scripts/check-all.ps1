@@ -14,7 +14,7 @@ $packages = @(
   @{ Dir = 'core-services/inventory-service'; HasTest = $true },
   @{ Dir = 'core-services/payment-service';   HasTest = $true },
   @{ Dir = 'core-services/gateway';           HasTest = $true },
-  @{ Dir = 'frontend';                        HasTest = $false }
+  @{ Dir = 'frontend';                        HasTest = $true;  Runner = 'vitest' }
 )
 
 function Invoke-Step {
@@ -44,7 +44,8 @@ foreach ($p in $packages) {
   }
 
   if (-not $stepFail -and $p.HasTest) {
-    $code = Invoke-Step 'test' @('npm', 'test', '--', '--runInBand')
+    $parallelFlag = if ($p.Runner -eq 'vitest') { '--no-file-parallelism' } else { '--runInBand' }
+    $code = Invoke-Step 'test' @('npm', 'test', '--', $parallelFlag)
     if ($code -ne 0) { $stepFail = $true }
   }
 
