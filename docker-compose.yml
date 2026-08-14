@@ -1,7 +1,7 @@
 name: ecomerce-microservicios
 
 # Red privada del proyecto: los servicios NO publican puertos al host
-# (solo gateway, frontend y mysql publican, según security/10 y security/12).
+# (solo gateway, frontend y mysql publican).
 # Nota: no se usa internal:true porque bloquea la publicación de puertos;
 # el aislamiento se logra no publicando puertos de los servicios.
 networks:
@@ -46,8 +46,18 @@ services:
       NODE_ENV: production
       PORT: 8000
       CORS_ORIGIN: http://localhost:5173
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET en .env}
+      AUTH_SERVICE_URL: http://auth-service:3002
+      USER_SERVICE_URL: http://user-service:3001
+      PRODUCT_SERVICE_URL: http://product-service:3003
+      CART_SERVICE_URL: http://cart-service:3004
+      ORDER_SERVICE_URL: http://order-service:3005
+      INVENTORY_SERVICE_URL: http://inventory-service:3006
+      PAYMENT_SERVICE_URL: http://payment-service:3007
+      REQUEST_TIMEOUT_MS: 15000
+      BODY_LIMIT: 100kb
     ports:
-      - "8001:8000"
+      - "8000:8000"
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8000/health | grep -q ok"]
       interval: 10s

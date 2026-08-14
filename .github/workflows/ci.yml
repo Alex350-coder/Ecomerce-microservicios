@@ -27,8 +27,7 @@ jobs:
             strict: true
           - dir: core-services/gateway
             strict: true
-          # auth-service: deuda preexistente F4 documentada en Progress.md
-          # (13 errores lint, 3 tests pendientes). lint/test no-bloqueantes;
+          # auth-service: deuda preexistente de lint y tests (no-bloqueantes).
           # typecheck y build SI bloquean.
           - dir: core-services/auth-service
             strict: false

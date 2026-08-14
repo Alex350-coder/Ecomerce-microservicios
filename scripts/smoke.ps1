@@ -10,7 +10,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 
 $services = @(
-  @{ Name = 'gateway';        Internal = $false; Url = 'http://localhost:8001/health' },
+  @{ Name = 'gateway';        Internal = $false; Url = 'http://localhost:8000/health' },
   @{ Name = 'auth-service';   Internal = $true;  Port = 3002 },
   @{ Name = 'user-service';   Internal = $true;  Port = 3001 },
   @{ Name = 'product-service';Internal = $true;  Port = 3003 },
