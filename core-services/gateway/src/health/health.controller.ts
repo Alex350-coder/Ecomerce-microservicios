@@ -1,22 +1,27 @@
 import { Controller, Get } from '@nestjs/common';
+import { HealthService } from './health.service';
 
 @Controller('health')
 export class HealthController {
+  constructor(private readonly healthService: HealthService) {}
+
   @Get()
-  check() {
-    return {
-      status: 'ok',
-      service: 'gateway',
-      timestamp: new Date().toISOString(),
-    };
+  async check() {
+    return this.healthService.report();
   }
 
   @Get('ready')
-  ready() {
+  async ready() {
+    const report = await this.healthService.report();
     return {
       status: 'ok',
       service: 'gateway',
-      dependencies: {},
+      dependencies: {
+        upstreams: report.upstreams.map((u) => ({
+          name: u.name,
+          status: u.status,
+        })),
+      },
       timestamp: new Date().toISOString(),
     };
   }

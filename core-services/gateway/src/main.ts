@@ -1,17 +1,33 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { JwtEdgeMiddleware } from './common/middlewares/jwt-edge.middleware';
+import { RequestIdMiddleware } from './common/middlewares/request-id.middleware';
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
   const configService = app.get(ConfigService);
 
-  const corsOrigin = configService.get<string>('CORS_ORIGIN');
-  if (corsOrigin) {
-    app.enableCors({ origin: corsOrigin });
-  }
+  const corsOrigins = (configService.get<string>('CORS_ORIGIN') ?? 'http://localhost:5173')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  app.use(helmet());
+  app.enableCors({
+    origin: corsOrigins,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id', 'Idempotency-Key'],
+    credentials: true,
+  });
+
+  const requestIdMiddleware = new RequestIdMiddleware();
+  const jwtEdgeMiddleware = new JwtEdgeMiddleware(configService);
+  app.use((req, res, next) => requestIdMiddleware.use(req, res, next));
+  app.use((req, res, next) => jwtEdgeMiddleware.use(req, res, next));
 
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
