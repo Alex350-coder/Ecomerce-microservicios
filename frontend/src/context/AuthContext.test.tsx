@@ -11,7 +11,11 @@ vi.mock('../api/client', () => ({
     statusCode: number;
     code?: string;
     requestId?: string;
-    constructor(statusCode: number, message: string, opts: { code?: string; requestId?: string } = {}) {
+    constructor(
+      statusCode: number,
+      message: string,
+      opts: { code?: string; requestId?: string } = {},
+    ) {
       super(message);
       this.statusCode = statusCode;
       this.code = opts.code;
@@ -22,9 +26,7 @@ vi.mock('../api/client', () => ({
 
 const apiClientMock = vi.mocked(apiClient);
 
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <AuthProvider>{children}</AuthProvider>
-);
+const wrapper = ({ children }: { children: ReactNode }) => <AuthProvider>{children}</AuthProvider>;
 
 function mockLoginResponse() {
   return {
@@ -69,9 +71,9 @@ describe('AuthContext', () => {
 
     const { result } = renderHook(() => useAuth(), { wrapper });
 
-    await expect(
-      act(async () => result.current.login('a@b.com', 'bad')),
-    ).rejects.toThrow('Credenciales inválidas');
+    await expect(act(async () => result.current.login('a@b.com', 'bad'))).rejects.toThrow(
+      'Credenciales inválidas',
+    );
     expect(result.current.isAuthenticated).toBe(false);
   });
 

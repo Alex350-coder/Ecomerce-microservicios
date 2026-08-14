@@ -75,9 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setRefreshHandler(refresh);
     const refreshResult = refresh();
 
-    refreshResult
-      .then(() => setIsInitializing(false))
-      .catch(() => setIsInitializing(false));
+    refreshResult.then(() => setIsInitializing(false)).catch(() => setIsInitializing(false));
 
     return () => setRefreshHandler(null);
   }, [refresh]);

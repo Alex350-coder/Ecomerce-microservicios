@@ -2,8 +2,7 @@ import { getAccessToken, getRefreshHandler, setAccessToken } from './auth';
 
 export { setAccessToken, setRefreshHandler, getAccessToken } from './auth';
 
-export const API_BASE_URL: string =
-  import.meta.env.VITE_API_URL ?? 'http://localhost:8000';
+export const API_BASE_URL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:8000';
 
 export class ApiError extends Error {
   readonly statusCode: number;
@@ -69,10 +68,7 @@ async function request(path: string, init: RequestInit): Promise<Response> {
   }
 }
 
-export async function apiClient<T>(
-  path: string,
-  init: RequestInit = {},
-): Promise<T> {
+export async function apiClient<T>(path: string, init: RequestInit = {}): Promise<T> {
   const isRefreshAttempt = path === '/auth/refresh';
 
   let response = await request(path, init);
