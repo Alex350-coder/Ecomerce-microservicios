@@ -39,6 +39,25 @@ Cada `core-services/<svc>/.env.example` define su `.env` local. Variables comune
 | `DB_SYNCHRONIZE` | `true` solo en desarrollo local; **siempre `false` en prod** |
 | `CORS_ORIGIN`    | (solo gateway) `http://localhost:5173`                  |
 
+### gateway (adicional)
+
+| Variable                | Descripción                                                     |
+|-------------------------|-----------------------------------------------------------------|
+| `JWT_SECRET`            | Secreto de firma JWT para la verificación de borde (min 16)     |
+| `AUTH_SERVICE_URL`      | URL interna del auth-service (3002)                             |
+| `USER_SERVICE_URL`      | URL interna del user-service (3001)                             |
+| `PRODUCT_SERVICE_URL`   | URL interna del product-service (3003)                          |
+| `CART_SERVICE_URL`      | URL interna del cart-service (3004)                             |
+| `ORDER_SERVICE_URL`     | URL interna del order-service (3005)                            |
+| `INVENTORY_SERVICE_URL` | URL interna del inventory-service (3006)                        |
+| `PAYMENT_SERVICE_URL`   | URL interna del payment-service (3007)                          |
+| `REQUEST_TIMEOUT_MS`    | Timeout del proxy al upstream (default 15000)                   |
+| `BODY_LIMIT`            | Límite de body reenviado (default 100kb)                        |
+| `THROTTLE_GLOBAL_TTL`   | TTL del rate-limit global en ms (default 60000)                 |
+| `THROTTLE_GLOBAL_LIMIT` | Límite de peticiones global por TTL (default 100)               |
+| `THROTTLE_AUTH_TTL`     | TTL del rate-limit de auth en ms (default 60000)                |
+| `THROTTLE_AUTH_LIMIT`   | Límite de peticiones en auth por TTL (default 10)               |
+
 ### auth-service (adicional)
 
 | Variable          | Descripción                       |
