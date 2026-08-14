@@ -4,6 +4,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card } from '../components/ui/Card';
 import { Link, useNavigate } from 'react-router-dom';
+import { apiClient, ApiError } from '../api/client';
 import '../styles/pages/Register.css';
 
 export const Register = () => {
@@ -32,27 +33,17 @@ export const Register = () => {
     if (success) setSuccess('');
   };
 
-  // 🆕 Verificar si el email ya existe antes de registrar
+  // Verificar si el email ya existe antes de registrar
   const checkEmailExists = async () => {
     // En un sistema completo, aquí harías una petición para verificar
     // Por ahora simulamos que no existe
     return false;
   };
 
-  // 🆕 Iniciar verificación de email
+  // Iniciar verificación de email
   const initiateEmailVerification = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:3001/users/${userId}/verify-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al enviar email de verificación');
-      }
-
+      await apiClient(`/users/${userId}/verify-email`, { method: 'POST' });
       setSuccess('Email de verificación enviado. Revisa tu bandeja de entrada.');
     } catch (error) {
       console.error('Error en verificación:', error);
@@ -60,20 +51,10 @@ export const Register = () => {
     }
   };
 
-  // 🆕 Verificar email inmediatamente (simulación)
+  // Verificar email inmediatamente (simulación)
   const verifyEmail = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:3001/users/${userId}/verify-email`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al verificar email');
-      }
-
+      await apiClient(`/users/${userId}/verify-email`, { method: 'PATCH' });
       setSuccess('¡Email verificado correctamente!');
       setShowEmailVerification(false);
     } catch (error) {
@@ -114,7 +95,7 @@ export const Register = () => {
     }
 
     try {
-      // 🆕 Verificar si el email ya existe (simulación)
+      // Verificar si el email ya existe (simulación)
       const emailExists = await checkEmailExists(formData.email);
       if (emailExists) {
         setError('Este email ya está registrado. ¿Olvidaste tu contraseña?');
@@ -122,11 +103,8 @@ export const Register = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:3001/users/register', {
+      const data = await apiClient('/users/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
@@ -135,34 +113,23 @@ export const Register = () => {
         }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        // 🆕 Manejo específico de errores del backend
-        if (response.status === 409) {
-          setError('Este email ya está registrado. ¿Olvidaste tu contraseña?');
-        } else if (response.status === 400) {
-          setError('Datos inválidos. Verifica la información ingresada.');
-        } else {
-          throw new Error(data.message || 'Error en el registro');
-        }
-        setIsLoading(false);
-        return;
-      }
-
-      // 🆕 Registro exitoso - nuevas funcionalidades
-      console.log('Usuario registrado:', data);
+      // Registro exitoso
       setRegisteredUserId(data.id);
 
-      // 🆕 Mostrar opción de verificación de email
+      // Mostrar opción de verificación de email
       setShowEmailVerification(true);
       setSuccess('¡Cuenta creada exitosamente! ');
 
-      // 🆕 Iniciar verificación de email automáticamente
+      // Iniciar verificación de email automáticamente
       await initiateEmailVerification(data.id);
     } catch (error) {
-      console.error('Error en registro:', error);
-      setError(error.message || 'Error al crear la cuenta. Intenta nuevamente.');
+      if (error instanceof ApiError && error.statusCode === 409) {
+        setError('Este email ya está registrado. ¿Olvidaste tu contraseña?');
+      } else if (error instanceof ApiError && error.statusCode === 400) {
+        setError('Datos inválidos. Verifica la información ingresada.');
+      } else {
+        setError(error?.message || 'Error al crear la cuenta. Intenta nuevamente.');
+      }
     } finally {
       setIsLoading(false);
     }

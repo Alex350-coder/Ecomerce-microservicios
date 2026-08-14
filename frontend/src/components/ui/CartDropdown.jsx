@@ -2,31 +2,14 @@ import React from 'react';
 import { Button } from './Button';
 import { Card } from './Card';
 import { Link } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 import '../../styles/ui/CartDropdown.css';
 
-export const CartDropdown = ({ isOpen, onClose, cartItems }) => {
-  // Datos de ejemplo (luego vendrán del contexto)
-  const sampleItems = [
-    {
-      id: 1,
-      name: 'iPhone 14 Pro',
-      price: 999,
-      quantity: 1,
-      image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=100&h=100&fit=crop',
-    },
-    {
-      id: 2,
-      name: 'AirPods Pro',
-      price: 249,
-      quantity: 2,
-      image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=100&h=100&fit=crop',
-    },
-  ];
-
-  const items = cartItems || sampleItems;
+export const CartDropdown = ({ isOpen, onClose }) => {
+  const { items, totalPrice } = useCart();
 
   const calculateTotal = () => {
-    return items.reduce((total, item) => total + item.price * item.quantity, 0);
+    return totalPrice;
   };
 
   if (!isOpen) return null;
@@ -52,9 +35,6 @@ export const CartDropdown = ({ isOpen, onClose, cartItems }) => {
             <div className="items-list">
               {items.map((item) => (
                 <Card key={item.id} className="cart-item">
-                  <div className="item-image">
-                    <img src={item.image} alt={item.name} />
-                  </div>
                   <div className="item-details">
                     <h4 className="item-name">{item.name}</h4>
                     <div className="item-price">${item.price}</div>
@@ -80,7 +60,7 @@ export const CartDropdown = ({ isOpen, onClose, cartItems }) => {
               <Button variant="outline" size="sm" onClick={onClose}>
                 Seguir Comprando
               </Button>
-              <Link to="/Checkout">
+              <Link to="/checkout">
                 <Button variant="primary" size="sm">
                   Proceder al Pago
                 </Button>

@@ -3,9 +3,7 @@ import { renderHook, act } from '@testing-library/react';
 import { type ReactNode } from 'react';
 import { CartProvider, useCart } from './CartContext';
 
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <CartProvider>{children}</CartProvider>
-);
+const wrapper = ({ children }: { children: ReactNode }) => <CartProvider>{children}</CartProvider>;
 
 describe('CartContext', () => {
   beforeEach(() => {
@@ -27,9 +25,7 @@ describe('CartContext', () => {
       result.current.addItem({ id: 'p1', name: 'iPhone', price: 999 });
     });
 
-    expect(result.current.items).toEqual([
-      { id: 'p1', name: 'iPhone', price: 999, quantity: 1 },
-    ]);
+    expect(result.current.items).toEqual([{ id: 'p1', name: 'iPhone', price: 999, quantity: 1 }]);
     expect(result.current.totalItems).toBe(1);
     expect(result.current.totalPrice).toBe(999);
   });
@@ -42,9 +38,7 @@ describe('CartContext', () => {
       result.current.addItem({ id: 'p1', name: 'iPhone', price: 999 });
     });
 
-    expect(result.current.items).toEqual([
-      { id: 'p1', name: 'iPhone', price: 999, quantity: 2 },
-    ]);
+    expect(result.current.items).toEqual([{ id: 'p1', name: 'iPhone', price: 999, quantity: 2 }]);
     expect(result.current.totalPrice).toBe(1998);
   });
 
@@ -57,9 +51,7 @@ describe('CartContext', () => {
       result.current.removeItem('p1');
     });
 
-    expect(result.current.items).toEqual([
-      { id: 'p2', name: 'MacBook', price: 1999, quantity: 1 },
-    ]);
+    expect(result.current.items).toEqual([{ id: 'p2', name: 'MacBook', price: 1999, quantity: 1 }]);
   });
 
   it('updateQuantity changes quantity and clamps below 1', () => {
@@ -104,9 +96,7 @@ describe('CartContext', () => {
 
     const { result } = renderHook(() => useCart(), { wrapper });
 
-    expect(result.current.items).toEqual([
-      { id: 'p1', name: 'iPhone', price: 999, quantity: 2 },
-    ]);
+    expect(result.current.items).toEqual([{ id: 'p1', name: 'iPhone', price: 999, quantity: 2 }]);
     expect(result.current.totalItems).toBe(2);
   });
 });

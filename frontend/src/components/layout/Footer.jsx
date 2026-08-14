@@ -16,21 +16,13 @@ export const Footer = () => {
             <h4>Enlaces Rápidos</h4>
             <ul>
               <li>
-                <Link to="/About">
-                  <a href="/about">Sobre Nosotros</a>
-                </Link>
+                <Link to="/about">Sobre Nosotros</Link>
               </li>
               <li>
-                <Link to="/Contact">
-                  <a href="/contact">Contacto</a>
-                </Link>
+                <Link to="/contact">Contacto</Link>
               </li>
               <li>
-                <Link to="/Support">
-                  <li>
-                    <a href="/support">Soporte</a>
-                  </li>
-                </Link>
+                <Link to="/support">Soporte</Link>
               </li>
             </ul>
           </div>
@@ -39,19 +31,13 @@ export const Footer = () => {
             <h4>Legal</h4>
             <ul>
               <li>
-                <Link to="/Privacy">
-                  <a href="/privacy">Política de Privacidad</a>
-                </Link>
+                <Link to="/privacy">Política de Privacidad</Link>
               </li>
               <li>
-                <Link to="/Terms">
-                  <a href="/terms">Términos de Servicio</a>
-                </Link>
+                <Link to="/terms">Términos de Servicio</Link>
               </li>
               <li>
-                <Link to="/Returns">
-                  <a href="/returns">Devoluciones</a>
-                </Link>
+                <Link to="/returns">Devoluciones</Link>
               </li>
             </ul>
           </div>

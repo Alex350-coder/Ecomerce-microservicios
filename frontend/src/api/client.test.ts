@@ -10,6 +10,10 @@ function jsonResponse(body: unknown, status = 200, headers: Record<string, strin
   });
 }
 
+async function captureError(promise: Promise<unknown>): Promise<ApiError> {
+  return (await promise.catch((e: unknown) => e)) as ApiError;
+}
+
 describe('apiClient', () => {
   const fetchMock = vi.fn();
 
@@ -78,10 +82,18 @@ describe('apiClient', () => {
 
   it('throws ApiError with standard fields on non-2xx', async () => {
     fetchMock.mockResolvedValue(
-      jsonResponse({ statusCode: 401, message: 'Token inválido', error: 'AUTH_INVALID_TOKEN', requestId: 'req_1' }, 401),
+      jsonResponse(
+        {
+          statusCode: 401,
+          message: 'Token inválido',
+          error: 'AUTH_INVALID_TOKEN',
+          requestId: 'req_1',
+        },
+        401,
+      ),
     );
 
-    const error = await apiClient('/auth/me').catch((e) => e);
+    const error = await captureError(apiClient('/auth/me'));
 
     expect(error).toBeInstanceOf(ApiError);
     expect(error.statusCode).toBe(401);
@@ -93,7 +105,7 @@ describe('apiClient', () => {
   it('falls back to status text when response body has no error shape', async () => {
     fetchMock.mockResolvedValue(jsonResponse('raw text', 500));
 
-    const error = await apiClient('/orders').catch((e) => e);
+    const error = await captureError(apiClient('/orders'));
 
     expect(error).toBeInstanceOf(ApiError);
     expect(error.statusCode).toBe(500);
@@ -102,7 +114,7 @@ describe('apiClient', () => {
   it('wraps network failures into ApiError 0', async () => {
     fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
 
-    const error = await apiClient('/products').catch((e) => e);
+    const error = await captureError(apiClient('/products'));
 
     expect(error).toBeInstanceOf(ApiError);
     expect(error.statusCode).toBe(0);
@@ -134,7 +146,7 @@ describe('apiClient', () => {
 
     fetchMock.mockResolvedValue(jsonResponse({ statusCode: 401, message: 'expired' }, 401));
 
-    const error = await apiClient('/auth/me').catch((e) => e);
+    const error = await captureError(apiClient('/auth/me'));
 
     expect(error).toBeInstanceOf(ApiError);
     expect(error.statusCode).toBe(401);
@@ -148,7 +160,7 @@ describe('apiClient', () => {
 
     fetchMock.mockResolvedValue(jsonResponse({ statusCode: 401, message: 'expired' }, 401));
 
-    const error = await apiClient('/auth/refresh', { method: 'POST' }).catch((e) => e);
+    const error = await captureError(apiClient('/auth/refresh', { method: 'POST' }));
 
     expect(error.statusCode).toBe(401);
     expect(refresh).not.toHaveBeenCalled();

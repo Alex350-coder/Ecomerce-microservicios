@@ -54,24 +54,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items]);
 
   const addItem = useCallback((item: AddCartItemInput) => {
-    setItems(prev => {
-      const existing = prev.find(i => i.id === item.id);
+    setItems((prev) => {
+      const existing = prev.find((i) => i.id === item.id);
       if (existing) {
-        return prev.map(i =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
-        );
+        return prev.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i));
       }
       return [...prev, { ...item, quantity: 1 }];
     });
   }, []);
 
   const removeItem = useCallback((id: string) => {
-    setItems(prev => prev.filter(i => i.id !== id));
+    setItems((prev) => prev.filter((i) => i.id !== id));
   }, []);
 
   const updateQuantity = useCallback((id: string, quantity: number) => {
-    setItems(prev =>
-      prev.map(i => {
+    setItems((prev) =>
+      prev.map((i) => {
         if (i.id !== id) return i;
         return { ...i, quantity: Math.max(1, quantity) };
       }),
@@ -82,10 +80,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems([]);
   }, []);
 
-  const totalItems = useMemo(
-    () => items.reduce((sum, item) => sum + item.quantity, 0),
-    [items],
-  );
+  const totalItems = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
 
   const totalPrice = useMemo(
     () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
