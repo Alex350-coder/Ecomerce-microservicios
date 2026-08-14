@@ -37,7 +37,7 @@ Tienda online de electrodomésticos y electrónica construida con una arquitectu
 3. `docker compose ps` → 9 contenedores `healthy`
 4. Smoke test: `powershell -File scripts/smoke.ps1` → `SMOKE OK (9/9)`
 
-Accesos: frontend `http://localhost:5173/`, gateway `http://localhost:8001/health`,
+Accesos: frontend `http://localhost:5173/`, gateway `http://localhost:8000/health`,
 MySQL `localhost:33061`. Detalles en `docs/SETUP.md`.
 
 ## Verificación de consistencia

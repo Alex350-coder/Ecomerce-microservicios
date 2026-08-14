@@ -12,7 +12,7 @@ Guía para levantar el stack completo de ElectroShop (MySQL + 8 servicios + fron
 | Servicio      | Puerto host | Puerto contenedor | Acceso |
 |---------------|-------------|-------------------|--------|
 | MySQL         | `33061`     | `3306`            | Solo host (mysqld local ocupa 3306) |
-| Gateway (API) | `8001`      | `8000`            | Host + frontend (proxy nginx) |
+| Gateway (API) | `8000`      | `8000`            | Host + frontend (proxy nginx) |
 | Frontend      | `5173`      | `80` (nginx)      | Host |
 
 > Los 7 servicios core **no publican puertos al host**.
@@ -52,7 +52,7 @@ Guía para levantar el stack completo de ElectroShop (MySQL + 8 servicios + fron
 
 ## Verificación de puertos y endpoints
 
-- Gateway: `http://localhost:8001/health` → `{"status":"ok",...}`
+- Gateway: `http://localhost:8000/health` → `{"status":"ok",...}`
 - Frontend: `http://localhost:5173/` (SPA; `/api/*` se proxya al gateway)
 - MySQL: `33061` con los usuarios por servicio (schemas creados por `docker/mysql/init/01-create-schemas.sh`).
 

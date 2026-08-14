@@ -26,7 +26,7 @@ check_host() {
 }
 
 fail=0
-check_host "gateway" "http://localhost:8001/health" || fail=1
+check_host "gateway" "http://localhost:8000/health" || fail=1
 check_service "auth-service" 3002 || fail=1
 check_service "user-service" 3001 || fail=1
 check_service "product-service" 3003 || fail=1
