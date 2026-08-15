@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 
 @Entity('addresses')
-@Index(['userId'])
+@Index('idx_addresses_user_id', ['userId'])
 export class Address {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

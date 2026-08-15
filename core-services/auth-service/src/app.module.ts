@@ -22,6 +22,9 @@ import { envValidationSchema } from './config/env.validation';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        migrations: [__dirname + '/migrations/*{.ts,.js}'],
+        migrationsTableName: 'migrations',
+        migrationsRun: configService.get('DB_MIGRATIONS_RUN') === 'true',
         synchronize:
           configService.get('NODE_ENV') !== 'production' &&
           configService.get('DB_SYNCHRONIZE') === 'true',

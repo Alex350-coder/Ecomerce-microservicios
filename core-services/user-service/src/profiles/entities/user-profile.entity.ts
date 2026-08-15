@@ -2,16 +2,18 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('user_profiles')
+@Index('uq_user_profiles_user_id', ['userId'], { unique: true })
 export class UserProfile {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'user_id', type: 'varchar', length: 36, unique: true })
+  @Column({ name: 'user_id', type: 'varchar', length: 36 })
   userId!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })

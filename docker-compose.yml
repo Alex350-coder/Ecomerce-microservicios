@@ -79,6 +79,7 @@ services:
       DB_PASSWORD: ${AUTH_DB_PASSWORD:?set AUTH_DB_PASSWORD en .env}
       DB_DATABASE: auth_db
       DB_SYNCHRONIZE: "false"
+      DB_MIGRATIONS_RUN: "true"
       JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET en .env}
       JWT_EXPIRES_IN: 1h
     depends_on:
@@ -105,6 +106,8 @@ services:
       DB_PASSWORD: ${USER_DB_PASSWORD:?set USER_DB_PASSWORD en .env}
       DB_DATABASE: user_db
       DB_SYNCHRONIZE: "false"
+      DB_MIGRATIONS_RUN: "true"
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET en .env}
     depends_on:
       mysql:
         condition: service_healthy
