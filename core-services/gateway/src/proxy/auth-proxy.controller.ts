@@ -10,6 +10,8 @@ export class AuthProxyController {
 
   @All('login')
   @All('register')
+  @All('refresh')
+  @All('logout')
   @All('forgot-password')
   @All('reset-password')
   async rateLimited(@Req() req: Request, @Res() res: Response): Promise<void> {

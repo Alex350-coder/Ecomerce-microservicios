@@ -36,6 +36,8 @@ describe('isPublicRoute', () => {
     expect(isPublicRoute('POST', '/auth/register')).toBe(true);
     expect(isPublicRoute('POST', '/auth/forgot-password')).toBe(true);
     expect(isPublicRoute('POST', '/auth/reset-password')).toBe(true);
+    expect(isPublicRoute('POST', '/auth/refresh')).toBe(true);
+    expect(isPublicRoute('POST', '/auth/logout')).toBe(true);
     expect(isPublicRoute('GET', '/health')).toBe(true);
     expect(isPublicRoute('GET', '/health/ready')).toBe(true);
     expect(isPublicRoute('GET', '/products')).toBe(true);
@@ -62,6 +64,16 @@ describe('JwtEdgeMiddleware', () => {
   it('deja pasar rutas públicas sin token', () => {
     const req = mockRequest('/auth/login', 'POST');
     middleware.use(req, mockResponse(), next);
+    expect(next).toHaveBeenCalled();
+  });
+
+  it('deja pasar refresh/logout sin token (usan cookie httpOnly, no Bearer)', () => {
+    const refresh = mockRequest('/auth/refresh', 'POST');
+    middleware.use(refresh, mockResponse(), next);
+    expect(next).toHaveBeenCalled();
+
+    const logout = mockRequest('/auth/logout', 'POST');
+    middleware.use(logout, mockResponse(), next);
     expect(next).toHaveBeenCalled();
   });
 
