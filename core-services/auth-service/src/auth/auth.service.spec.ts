@@ -112,7 +112,9 @@ describe('AuthService', () => {
 
       const result = await service.register(dto);
 
-      expect(result.message).toBe('Si el email no está registrado, la cuenta ha sido creada correctamente.');
+      expect(result.message).toBe(
+        'Si el email no está registrado, la cuenta ha sido creada correctamente.',
+      );
       const saved = userRepo.save.mock.calls[0][0] as User;
       expect(saved.password).toBe('hashed-password');
       expect(saved.password).not.toBe('password123');
@@ -125,7 +127,9 @@ describe('AuthService', () => {
 
       const result = await service.register(dto);
 
-      expect(result.message).toBe('Si el email no está registrado, la cuenta ha sido creada correctamente.');
+      expect(result.message).toBe(
+        'Si el email no está registrado, la cuenta ha sido creada correctamente.',
+      );
       expect(userRepo.save).not.toHaveBeenCalled();
       expect(userSync.notifyUserCreated).not.toHaveBeenCalled();
     });

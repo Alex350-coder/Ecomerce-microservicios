@@ -106,7 +106,8 @@ describe('JwtEdgeMiddleware', () => {
   it('rechaza JWT con alg none / payload alterado con 401 (A8)', () => {
     const res = mockResponse();
     const req = mockRequest('/users/me', 'GET', {
-      authorization: 'Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJ1c2VyLTEyMyIsInJvbGUiOiJhZG1pbiJ9.',
+      authorization:
+        'Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJ1c2VyLTEyMyIsInJvbGUiOiJhZG1pbiJ9.',
     });
     middleware.use(req, res, next);
     expect(res.status).toHaveBeenCalledWith(401);
