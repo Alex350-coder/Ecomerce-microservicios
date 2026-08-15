@@ -4,6 +4,8 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card } from '../components/ui/Card';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { apiClient, ApiError } from '../api/client';
 import '../styles/pages/Login.css';
 
 export const Login = () => {
@@ -20,11 +22,20 @@ export const Login = () => {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useAuth();
 
   // Mostrar mensaje de éxito si viene del registro
   const successMessage = location.state?.message;
 
-  // 🆕 SOLICITAR RECUPERACIÓN DE CONTRASEÑA
+  const getErrorMessage = (err) => {
+    if (err instanceof ApiError) {
+      if (err.statusCode === 401) return 'Credenciales inválidas. Verifica tu email y contraseña.';
+      if (err.statusCode === 423) return 'Cuenta bloqueada. Contacta al administrador.';
+    }
+    return err?.message || 'Error de conexión. Intenta nuevamente.';
+  };
+
+  // SOLICITAR RECUPERACIÓN DE CONTRASEÑA
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -32,34 +43,21 @@ export const Login = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('http://localhost:3002/auth/forgot-password', {
+      await apiClient('/auth/forgot-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ email: forgotPasswordEmail }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Error al solicitar recuperación');
-      }
-
       setSuccess('Si el email existe, se enviarán instrucciones de recuperación');
       setShowForgotPassword(false);
-
-      // 🆕 Mostrar instrucciones para usar el token (en desarrollo)
-      console.log('En producción se enviaría un email. Token de desarrollo:', data.debugToken);
-    } catch (error) {
-      console.error('Error en recuperación:', error);
-      setError(error.message || 'Error al procesar la solicitud');
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 🆕 RESTABLECER CONTRASEÑA CON TOKEN
+  // RESTABLECER CONTRASEÑA CON TOKEN
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -67,36 +65,23 @@ export const Login = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('http://localhost:3002/auth/reset-password', {
+      await apiClient('/auth/reset-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token: resetToken,
-          newPassword: newPassword,
-        }),
+        body: JSON.stringify({ token: resetToken, newPassword }),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Error al restablecer contraseña');
-      }
 
       setSuccess('Contraseña restablecida correctamente. Ahora puedes iniciar sesión.');
       setShowResetPassword(false);
       setResetToken('');
       setNewPassword('');
-    } catch (error) {
-      console.error('Error en restablecimiento:', error);
-      setError(error.message || 'Token inválido o expirado');
+    } catch (err) {
+      setError(err instanceof ApiError ? 'Token inválido o expirado' : getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 🆕 INICIAR SESIÓN MEJORADO
+  // INICIAR SESIÓN
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -104,54 +89,17 @@ export const Login = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('http://localhost:3002/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const user = await login(email, password);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        // 🆕 Manejo específico de errores
-        if (response.status === 401) {
-          if (data.message?.includes('bloqueada')) {
-            setError(
-              'Cuenta temporalmente bloqueada por múltiples intentos fallidos. Intenta en 15 minutos.',
-            );
-          } else {
-            setError('Credenciales inválidas. Verifica tu email y contraseña.');
-          }
-        } else if (response.status === 423) {
-          setError('Cuenta bloqueada. Contacta al administrador.');
-        } else {
-          throw new Error(data.message || 'Error en el inicio de sesión');
-        }
-        setIsLoading(false);
-        return;
-      }
-
-      // 🆕 Login exitoso - mejorado
-      console.log('Login exitoso:', data);
-
-      // Guardar token y datos de usuario
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-
-      // 🆕 Verificar si el email está verificado
-      if (!data.user.emailVerified) {
+      if (!user.emailVerified) {
         setSuccess('¡Bienvenido! Tu email no está verificado. Te recomendamos verificarlo.');
       }
 
-      // Redirigir al dashboard después de un breve delay
       setTimeout(() => {
         navigate('/');
       }, 1500);
-    } catch (error) {
-      console.error('Error en login:', error);
-      setError(error.message || 'Error de conexión. Intenta nuevamente.');
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -333,7 +281,7 @@ export const Login = () => {
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                minLength={6}
+                minLength={8}
               />
 
               <div className="reset-actions">

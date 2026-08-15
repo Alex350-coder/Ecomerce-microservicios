@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Button } from './Button';
 import { CartDropdown } from './CartDropdown';
+import { useCart } from '../../context/CartContext';
 import '../../styles/ui/CartIcon.css';
 
 export const CartIcon = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [itemCount] = useState(3); // Ejemplo: 3 items en carrito
+  const { totalItems } = useCart();
 
   return (
     <>
@@ -14,9 +15,10 @@ export const CartIcon = () => {
         size="sm"
         className="cart-icon-button"
         onClick={() => setIsCartOpen(true)}
+        aria-label={`Abrir carrito (${totalItems} artículos)`}
       >
         🛒
-        {itemCount > 0 && <span className="cart-badge">{itemCount}</span>}
+        {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
       </Button>
 
       <CartDropdown isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

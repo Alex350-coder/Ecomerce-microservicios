@@ -1,36 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Navbar } from './Navbar';
 import { CartIcon } from '../ui/CartIcon';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import '../../styles/layout/Header.css';
 
 export const Header = () => {
-  // 🆕 Verificar si el usuario está logueado
-  const isLoggedIn = !!localStorage.getItem('token');
-  const userData = isLoggedIn ? JSON.parse(localStorage.getItem('user') || '{}') : null;
+  const { user, isAuthenticated, isInitializing, logout } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // 🆕 Obtener nombre para mostrar
+  // Obtener nombre para mostrar
   const getUserDisplayName = () => {
-    if (!userData) return 'Usuario';
+    if (!user) return 'Usuario';
 
-    if (userData.firstName && userData.lastName) {
-      return `${userData.firstName} ${userData.lastName}`;
-    } else if (userData.firstName) {
-      return userData.firstName;
-    } else if (userData.email) {
-      return userData.email.split('@')[0];
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    } else if (user.firstName) {
+      return user.firstName;
+    } else if (user.email) {
+      return user.email.split('@')[0];
     }
 
     return 'Usuario';
   };
 
-  // 🆕 Manejar logout
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.reload(); // Recargar para actualizar la UI
+  // Manejar logout
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const query = searchQuery.trim();
+    if (query) {
+      window.location.href = `/products?q=${encodeURIComponent(query)}`;
+    }
   };
 
   return (
@@ -47,16 +53,23 @@ export const Header = () => {
           </Link>
 
           {/* Barra de búsqueda */}
-          <div className="header__search">
-            <Input type="text" placeholder="Buscar productos..." className="search-input" />
-          </div>
+          <form className="header__search" onSubmit={handleSearch} role="search">
+            <Input
+              type="text"
+              placeholder="Buscar productos..."
+              className="search-input"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Buscar productos"
+            />
+          </form>
 
           {/* Navegación */}
           <nav className="header__nav">
             <CartIcon />
 
-            {isLoggedIn ? (
-              // 🆕 MENÚ PARA USUARIO LOGUEADO
+            {isInitializing ? null : isAuthenticated ? (
+              // MENÚ PARA USUARIO LOGUEADO
               <div className="user-menu">
                 <Link to="/account">
                   <Button variant="ghost" size="sm" className="user-button">
@@ -76,7 +89,7 @@ export const Header = () => {
                 </div>
               </div>
             ) : (
-              // 🆕 BOTONES PARA USUARIO NO LOGUEADO
+              // BOTONES PARA USUARIO NO LOGUEADO
               <>
                 <Link to="/account">
                   <Button variant="ghost" size="sm">

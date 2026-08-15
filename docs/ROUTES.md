@@ -33,11 +33,15 @@ Cualquier otro prefijo no mapeado devuelve `404 ROUTE_NOT_FOUND`.
 
 - **CORS**: solo `http://localhost:5173` (configurable vía `CORS_ORIGIN`).
 - **Rate-limit**: global 100 req/TTL (60s) + ruteo auth 10 req/60s
-  (`/auth/login`, `/auth/register`, `/auth/forgot-password`, `/auth/reset-password`).
+  (`/auth/login`, `/auth/register`, `/auth/refresh`, `/auth/logout`,
+  `/auth/forgot-password`, `/auth/reset-password`).
 - **JWT (edge)**: verificación previa al proxy. Rutas públicas no requieren
   token: `GET /health`, `GET /health/ready`, `POST /auth/login`,
-  `POST /auth/register`, `POST /auth/forgot-password`, `POST /auth/reset-password`,
-  `GET /products*`.
+  `POST /auth/register`, `POST /auth/refresh`, `POST /auth/logout`,
+  `POST /auth/forgot-password`, `POST /auth/reset-password`, `GET /products*`.
+  `POST /auth/refresh` y `POST /auth/logout` son públicas porque operan con la
+  cookie httpOnly (no hay token en el navegador); el refresh valida la cookie
+  y emite un access token nuevo, y el logout revoca el refresh.
 - **Cabeceras de identidad**: el gateway inyecta `X-User-Id` (sub) y
   `X-User-Role` (role) al upstream y **siempre** descarta las enviadas por el
   cliente (anti-spoofing).

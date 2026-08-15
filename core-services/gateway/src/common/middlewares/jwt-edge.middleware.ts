@@ -11,6 +11,8 @@ const PUBLIC_PATHS: Array<{ method?: string; pattern: RegExp }> = [
   { pattern: /^\/health(\/.*)?$/ },
   { pattern: /^\/auth\/login$/ },
   { pattern: /^\/auth\/register$/ },
+  { pattern: /^\/auth\/refresh$/ },
+  { pattern: /^\/auth\/logout$/ },
   { pattern: /^\/auth\/forgot-password$/ },
   { pattern: /^\/auth\/reset-password$/ },
   { method: 'GET', pattern: /^\/products(\/.*)?$/ },

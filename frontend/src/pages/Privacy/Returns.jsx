@@ -56,7 +56,7 @@ export const Returns = () => {
             </div>
 
             <div className="policy-actions">
-              <Link to="/ReturnRequest">
+              <Link to="/return-request">
                 <Button variant="primary" size="lg">
                   Solicitar Devolución
                 </Button>

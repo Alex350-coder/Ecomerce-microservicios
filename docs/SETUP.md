@@ -56,6 +56,36 @@ Guía para levantar el stack completo de ElectroShop (MySQL + 8 servicios + fron
 - Frontend: `http://localhost:5173/` (SPA; `/api/*` se proxya al gateway)
 - MySQL: `33061` con los usuarios por servicio (schemas creados por `docker/mysql/init/01-create-schemas.sh`).
 
+## Migraciones y seed
+
+Las migraciones TypeORM se ejecutan automáticamente al arrancar el contenedor
+cuando `DB_MIGRATIONS_RUN=true` (así está por defecto en `docker-compose.yml`
+para auth-service y user-service; ADR-014). Los schemas se crean una sola vez
+por `docker/mysql/init/01-create-schemas.sh`.
+
+Para aplicar/revertir migraciones manualmente con la CLI (desde cada servicio):
+
+```bash
+cd core-services/auth-service   # o user-service
+npm run migration:run           # aplicar pendientes
+npm run migration:revert        # revertir la última
+npm run migration:generate -- src/migrations/NombreMigracion   # generar desde entidades
+```
+
+> `migration:generate` requiere conexión a la MySQL (host: `localhost:33061` con
+> las credenciales del servicio en el `.env` raíz).
+
+**Seed de desarrollo** (usuarios `admin` + `demo`, email verificado, para probar
+el slice vertical sin pasar por el flujo de registro/verificación):
+
+```bash
+cd core-services/auth-service
+npm run seed   # usa SEED_ADMIN_EMAIL/PASSWORD y SEED_DEMO_EMAIL/PASSWORD (ver .env.example)
+```
+
+El seed es idempotente: no duplica usuarios existentes. No incluye secretos
+reales: las credenciales van en `.env` (nunca commitear las de producción).
+
 ## Comandos útiles
 
 ```bash

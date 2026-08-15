@@ -1,10 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Account } from './pages/Account';
 import { Checkout } from './pages/Checkout';
 import { Products } from './pages/Products';
+import { Cart } from './pages/Cart';
+import { Orders } from './pages/Orders';
+import { ForgotPassword } from './pages/ForgotPassword';
+import { ProductDetail } from './pages/ProductDetail';
 import { About } from './pages/FastLinks';
 import { Contact } from './pages/FastLinks';
 import { Support } from './pages/FastLinks';
@@ -23,16 +27,21 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/Account" element={<Account />} />
-        <Route path="/Checkout" element={<Checkout />} />
-        <Route path="/Products" element={<Products />} />
-        <Route path="/About" element={<About />} />
-        <Route path="/Contact" element={<Contact />} />
-        <Route path="/Support" element={<Support />} />
-        <Route path="/Privacy" element={<Privacy />} />
-        <Route path="/Returns" element={<Returns />} />
-        <Route path="/ReturnRequest" element={<ReturnRequest />} />
-        <Route path="/Terms" element={<Terms />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/account" element={<Account />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/orders" element={<Orders />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/returns" element={<Returns />} />
+        <Route path="/return-request" element={<ReturnRequest />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

@@ -36,6 +36,8 @@ describe('isPublicRoute', () => {
     expect(isPublicRoute('POST', '/auth/register')).toBe(true);
     expect(isPublicRoute('POST', '/auth/forgot-password')).toBe(true);
     expect(isPublicRoute('POST', '/auth/reset-password')).toBe(true);
+    expect(isPublicRoute('POST', '/auth/refresh')).toBe(true);
+    expect(isPublicRoute('POST', '/auth/logout')).toBe(true);
     expect(isPublicRoute('GET', '/health')).toBe(true);
     expect(isPublicRoute('GET', '/health/ready')).toBe(true);
     expect(isPublicRoute('GET', '/products')).toBe(true);
@@ -65,6 +67,16 @@ describe('JwtEdgeMiddleware', () => {
     expect(next).toHaveBeenCalled();
   });
 
+  it('deja pasar refresh/logout sin token (usan cookie httpOnly, no Bearer)', () => {
+    const refresh = mockRequest('/auth/refresh', 'POST');
+    middleware.use(refresh, mockResponse(), next);
+    expect(next).toHaveBeenCalled();
+
+    const logout = mockRequest('/auth/logout', 'POST');
+    middleware.use(logout, mockResponse(), next);
+    expect(next).toHaveBeenCalled();
+  });
+
   it('rechaza ruta protegida sin token con 401 estándar', () => {
     const res = mockResponse();
     const req = mockRequest('/users/me');
@@ -79,6 +91,34 @@ describe('JwtEdgeMiddleware', () => {
   it('rechaza token inválido con 401', () => {
     const res = mockResponse();
     const req = mockRequest('/users/me', 'GET', { authorization: 'Bearer invalid.token.here' });
+    middleware.use(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(401);
+  });
+
+  it('rechaza JWT firmado con otro secret con 401 (A7)', () => {
+    const token = jwt.sign({ sub: 'user-123', role: 'admin' }, 'a-completely-different-secret');
+    const res = mockResponse();
+    const req = mockRequest('/users/me', 'GET', { authorization: `Bearer ${token}` });
+    middleware.use(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(401);
+  });
+
+  it('rechaza JWT con alg none / payload alterado con 401 (A8)', () => {
+    const res = mockResponse();
+    const req = mockRequest('/users/me', 'GET', {
+      authorization:
+        'Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJ1c2VyLTEyMyIsInJvbGUiOiJhZG1pbiJ9.',
+    });
+    middleware.use(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(401);
+  });
+
+  it('rechaza access token vencido con 401 (A4)', () => {
+    const token = jwt.sign({ sub: 'user-123', role: 'admin' }, JWT_SECRET, {
+      expiresIn: '-1s',
+    });
+    const res = mockResponse();
+    const req = mockRequest('/users/me', 'GET', { authorization: `Bearer ${token}` });
     middleware.use(req, res, next);
     expect(res.status).toHaveBeenCalledWith(401);
   });

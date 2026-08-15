@@ -3,9 +3,12 @@ import { MainLayout } from '../templates/MainLayout';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card } from '../components/ui/Card';
+import { useAuth } from '../context/AuthContext';
+import { apiClient } from '../api/client';
 import '../styles/pages/Account.css';
 
 export const Account = () => {
+  const { user, logout } = useAuth();
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
@@ -22,7 +25,7 @@ export const Account = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // 🆕 Estados para cambiar contraseña
+  // Estados para cambiar contraseña
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -30,35 +33,25 @@ export const Account = () => {
     confirmPassword: '',
   });
 
-  // 🆕 Cargar datos del usuario al montar el componente
+  // Cargar datos del usuario al montar el componente
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const token = localStorage.getItem('token');
-
-    if (token && user.id) {
-      // 🆕 Obtener datos actualizados del usuario
+    if (user?.id) {
       fetchUserData(user.id);
     } else {
       setError('No hay usuario logueado');
     }
-  }, []);
+  }, [user?.id]);
 
-  // 🆕 Obtener datos del usuario desde el user-service
+  // Obtener datos del usuario desde el user-service
   const fetchUserData = async (userId) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:3001/users/profile/${userId}`);
-
-      if (!response.ok) {
-        throw new Error('Error al cargar datos del usuario');
-      }
-
-      const user = await response.json();
+      const data = await apiClient(`/users/profile/${userId}`);
       setUserData((prev) => ({
         ...prev,
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
+        firstName: data.firstName || '',
+        lastName: data.lastName || '',
+        email: data.email || '',
       }));
     } catch (error) {
       console.error('Error:', error);
@@ -75,22 +68,17 @@ export const Account = () => {
     }));
   };
 
-  // 🆕 Actualizar perfil en el user-service
+  // Actualizar perfil en el user-service
   const handleSave = async () => {
     try {
       setIsLoading(true);
       setError('');
       setSuccess('');
 
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const token = localStorage.getItem('token');
+      if (!user?.id) throw new Error('No hay usuario logueado');
 
-      const response = await fetch(`http://localhost:3001/users/profile/${user.id}`, {
+      const updatedUser = await apiClient(`/users/profile/${user.id}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({
           firstName: userData.firstName,
           lastName: userData.lastName,
@@ -98,47 +86,37 @@ export const Account = () => {
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al actualizar perfil');
-      }
-
-      const updatedUser = await response.json();
-
-      // 🆕 Actualizar localStorage con nuevos datos
-      localStorage.setItem(
-        'user',
-        JSON.stringify({
-          ...user,
-          ...updatedUser,
-        }),
-      );
+      setUserData((prev) => ({
+        ...prev,
+        firstName: updatedUser.firstName ?? prev.firstName,
+        lastName: updatedUser.lastName ?? prev.lastName,
+        email: updatedUser.email ?? prev.email,
+      }));
 
       setSuccess('Perfil actualizado correctamente');
       setIsEditing(false);
     } catch (error) {
       console.error('Error:', error);
-      setError(error.message || 'Error al actualizar perfil');
+      setError(error?.message || 'Error al actualizar perfil');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    // 🆕 Recargar datos originales
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    // Recargar datos originales desde el contexto
     setUserData((prev) => ({
       ...prev,
-      firstName: user.firstName || '',
-      lastName: user.lastName || '',
-      email: user.email || '',
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      email: user?.email || '',
     }));
     setIsEditing(false);
     setError('');
     setSuccess('');
   };
 
-  // 🆕 Cambiar contraseña
+  // Cambiar contraseña
   const handleChangePassword = async () => {
     try {
       setIsLoading(true);
@@ -149,29 +127,19 @@ export const Account = () => {
         throw new Error('Las contraseñas no coinciden');
       }
 
-      if (passwordData.newPassword.length < 6) {
-        throw new Error('La nueva contraseña debe tener al menos 6 caracteres');
+      if (passwordData.newPassword.length < 8) {
+        throw new Error('La nueva contraseña debe tener al menos 8 caracteres');
       }
 
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const token = localStorage.getItem('token');
+      if (!user?.id) throw new Error('No hay usuario logueado');
 
-      const response = await fetch(`http://localhost:3002/auth/${user.id}/password`, {
+      await apiClient(`/auth/${user.id}/password`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({
           currentPassword: passwordData.currentPassword,
           newPassword: passwordData.newPassword,
         }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al cambiar contraseña');
-      }
 
       setSuccess('Contraseña cambiada correctamente');
       setShowChangePassword(false);
@@ -182,53 +150,38 @@ export const Account = () => {
       });
     } catch (error) {
       console.error('Error:', error);
-      setError(error.message || 'Error al cambiar contraseña');
+      setError(error?.message || 'Error al cambiar contraseña');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 🆕 Cerrar sesión
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  // Cerrar sesión
+  const handleLogout = async () => {
+    await logout();
     window.location.href = '/login';
   };
 
-  // 🆕 Verificación de email
+  // Verificación de email
   const handleVerifyEmail = async () => {
     try {
       setIsLoading(true);
       setError('');
 
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const token = localStorage.getItem('token');
+      if (!user?.id) throw new Error('No hay usuario logueado');
 
-      const response = await fetch(`http://localhost:3002/auth/${user.id}/verify-email`, {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al verificar email');
-      }
+      await apiClient(`/auth/${user.id}/verify-email`, { method: 'PATCH' });
 
       setSuccess('Email verificado correctamente');
-
-      // Actualizar estado en localStorage
-      const updatedUser = { ...user, emailVerified: true };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
     } catch (error) {
       console.error('Error:', error);
-      setError(error.message || 'Error al verificar email');
+      setError(error?.message || 'Error al verificar email');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const emailVerified = user?.emailVerified ?? false;
 
   return (
     <MainLayout>
@@ -238,7 +191,7 @@ export const Account = () => {
           <p>Gestiona tu información personal y preferencias</p>
         </div>
 
-        {/* 🆕 Mensajes de éxito/error */}
+        {/* Mensajes de éxito/error */}
         {error && <div className="account-message error-message">{error}</div>}
 
         {success && <div className="account-message success-message">{success}</div>}
@@ -298,11 +251,11 @@ export const Account = () => {
                 />
                 <div className="email-verification">
                   <span
-                    className={`verification-status ${user.emailVerified ? 'verified' : 'not-verified'}`}
+                    className={`verification-status ${emailVerified ? 'verified' : 'not-verified'}`}
                   >
-                    {user.emailVerified ? '✓ Email verificado' : '✗ Email no verificado'}
+                    {emailVerified ? '✓ Email verificado' : '✗ Email no verificado'}
                   </span>
-                  {!user.emailVerified && (
+                  {!emailVerified && (
                     <Button
                       variant="ghost"
                       size="sm"
