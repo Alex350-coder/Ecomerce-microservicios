@@ -3,6 +3,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { envValidationSchema } from './config/env.validation';
 import { HealthModule } from './health/health.module';
+import { AuthModule } from './auth/auth.module';
+import { ProfilesModule } from './profiles/profiles.module';
+import { InternalModule } from './internal/internal.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { HealthModule } from './health/health.module';
       }),
     }),
     HealthModule,
+    AuthModule,
+    ProfilesModule,
+    InternalModule,
   ],
 })
 export class AppModule {}
