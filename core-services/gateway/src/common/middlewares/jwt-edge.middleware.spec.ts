@@ -95,6 +95,33 @@ describe('JwtEdgeMiddleware', () => {
     expect(res.status).toHaveBeenCalledWith(401);
   });
 
+  it('rechaza JWT firmado con otro secret con 401 (A7)', () => {
+    const token = jwt.sign({ sub: 'user-123', role: 'admin' }, 'a-completely-different-secret');
+    const res = mockResponse();
+    const req = mockRequest('/users/me', 'GET', { authorization: `Bearer ${token}` });
+    middleware.use(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(401);
+  });
+
+  it('rechaza JWT con alg none / payload alterado con 401 (A8)', () => {
+    const res = mockResponse();
+    const req = mockRequest('/users/me', 'GET', {
+      authorization: 'Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJ1c2VyLTEyMyIsInJvbGUiOiJhZG1pbiJ9.',
+    });
+    middleware.use(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(401);
+  });
+
+  it('rechaza access token vencido con 401 (A4)', () => {
+    const token = jwt.sign({ sub: 'user-123', role: 'admin' }, JWT_SECRET, {
+      expiresIn: '-1s',
+    });
+    const res = mockResponse();
+    const req = mockRequest('/users/me', 'GET', { authorization: `Bearer ${token}` });
+    middleware.use(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(401);
+  });
+
   it('acepta token válido e inyecta X-User-Id/X-User-Role', () => {
     const token = jwt.sign({ sub: 'user-123', role: 'admin' }, JWT_SECRET);
     const req = mockRequest('/users/me', 'GET', { authorization: `Bearer ${token}` });

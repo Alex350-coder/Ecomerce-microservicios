@@ -82,40 +82,40 @@ export class AuthService {
     return this.jwtService.sign({ email: user.email, sub: user.id, role: user.role });
   }
 
-  async register(registerDto: RegisterDto): Promise<{ user: AuthUser }> {
+  async register(registerDto: RegisterDto): Promise<{ message: string }> {
     const existing = await this.usersRepository.findOne({
       where: { email: registerDto.email },
     });
 
-    if (existing) {
-      throw new ConflictException('El email ya está registrado');
-    }
-
-    const hashedPassword = await bcrypt.hash(registerDto.password, 12);
-    const user = this.usersRepository.create({
-      email: registerDto.email,
-      password: hashedPassword,
-      firstName: registerDto.firstName,
-      lastName: registerDto.lastName,
-      role: 'customer',
-      isActive: true,
-      emailVerified: false,
-    });
-
-    const saved = await this.usersRepository.save(user);
-
-    try {
-      await this.userSyncService.notifyUserCreated({
-        id: saved.id,
-        email: saved.email,
-        firstName: saved.firstName,
-        lastName: saved.lastName,
+    if (!existing) {
+      const hashedPassword = await bcrypt.hash(registerDto.password, 12);
+      const user = this.usersRepository.create({
+        email: registerDto.email,
+        password: hashedPassword,
+        firstName: registerDto.firstName,
+        lastName: registerDto.lastName,
+        role: 'customer',
+        isActive: true,
+        emailVerified: false,
       });
-    } catch {
-      // La creación del perfil en user-service es best-effort; no bloquea el registro.
+
+      const saved = await this.usersRepository.save(user);
+
+      try {
+        await this.userSyncService.notifyUserCreated({
+          id: saved.id,
+          email: saved.email,
+          firstName: saved.firstName,
+          lastName: saved.lastName,
+        });
+      } catch {
+        // La creación del perfil en user-service es best-effort; no bloquea el registro.
+      }
     }
 
-    return { user: this.toAuthUser(saved) };
+    return {
+      message: 'Si el email no está registrado, la cuenta ha sido creada correctamente.',
+    };
   }
 
   async login(loginDto: LoginDto): Promise<LoginResult> {

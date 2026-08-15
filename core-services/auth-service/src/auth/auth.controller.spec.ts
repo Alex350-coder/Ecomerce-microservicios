@@ -46,8 +46,10 @@ describe('AuthController', () => {
   });
 
   describe('POST /auth/register', () => {
-    it('registers and returns the created user', async () => {
-      service.register.mockResolvedValue({ user: { id: 'user-1', email: 'a@b.com' } });
+    it('returns a uniform generic message (sin enumeración de emails)', async () => {
+      service.register.mockResolvedValue({
+        message: 'Si el email no está registrado, la cuenta ha sido creada correctamente.',
+      });
       const dto: RegisterDto = {
         email: 'a@b.com',
         password: 'password123',
@@ -58,7 +60,10 @@ describe('AuthController', () => {
       const result = await controller.register(dto);
 
       expect(service.register).toHaveBeenCalledWith(dto);
-      expect(result).toEqual({ user: expect.objectContaining({ email: 'a@b.com' }) });
+      expect(result).toEqual({
+        message: expect.stringContaining('email no está registrado'),
+      });
+      expect(result).not.toHaveProperty('user');
     });
   });
 

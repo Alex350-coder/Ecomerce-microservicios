@@ -112,9 +112,7 @@ describe('AuthService', () => {
 
       const result = await service.register(dto);
 
-      expect(result.user.role).toBe('customer');
-      expect(result.user.email).toBe('ana@example.com');
-      expect((result.user as unknown as Record<string, unknown>).password).toBeUndefined();
+      expect(result.message).toBe('Si el email no está registrado, la cuenta ha sido creada correctamente.');
       const saved = userRepo.save.mock.calls[0][0] as User;
       expect(saved.password).toBe('hashed-password');
       expect(saved.password).not.toBe('password123');
@@ -122,10 +120,13 @@ describe('AuthService', () => {
       expect(saved.emailVerified).toBe(false);
     });
 
-    it('rejects duplicate email with a generic conflict and does not notify user-service', async () => {
+    it('returns a generic message for a duplicate email and does not notify user-service', async () => {
       userRepo.findOne.mockResolvedValue(baseUser);
 
-      await expect(service.register(dto)).rejects.toBeInstanceOf(ConflictException);
+      const result = await service.register(dto);
+
+      expect(result.message).toBe('Si el email no está registrado, la cuenta ha sido creada correctamente.');
+      expect(userRepo.save).not.toHaveBeenCalled();
       expect(userSync.notifyUserCreated).not.toHaveBeenCalled();
     });
 
@@ -188,6 +189,20 @@ describe('AuthService', () => {
 
       await expect(service.login(dto)).rejects.toThrow(/bloqueada/);
       expect(userRepo.save).not.toHaveBeenCalled();
+    });
+
+    it('allows login after the lockout window has expired (A3)', async () => {
+      userRepo.findOne
+        .mockResolvedValueOnce({ ...baseUser, lockedUntil: pastDate(1_000) })
+        .mockResolvedValue(baseUser);
+
+      const result = await service.login(dto);
+
+      expect(result.accessToken).toBe('signed-token');
+      expect(userRepo.update).toHaveBeenCalledWith('user-1', {
+        loginAttempts: 0,
+        lockedUntil: null,
+      });
     });
   });
 

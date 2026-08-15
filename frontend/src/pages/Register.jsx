@@ -20,7 +20,6 @@ export const Register = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [showEmailVerification, setShowEmailVerification] = useState(false);
-  const [registeredUserId, setRegisteredUserId] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (field, value) => {
@@ -38,29 +37,6 @@ export const Register = () => {
     // En un sistema completo, aquí harías una petición para verificar
     // Por ahora simulamos que no existe
     return false;
-  };
-
-  // Iniciar verificación de email
-  const initiateEmailVerification = async (userId) => {
-    try {
-      await apiClient(`/auth/${userId}/verify-email`, { method: 'POST' });
-      setSuccess('Email de verificación enviado. Revisa tu bandeja de entrada.');
-    } catch (error) {
-      console.error('Error en verificación:', error);
-      // No mostramos error para no confundir al usuario
-    }
-  };
-
-  // Verificar email inmediatamente (simulación)
-  const verifyEmail = async (userId) => {
-    try {
-      await apiClient(`/auth/${userId}/verify-email`, { method: 'PATCH' });
-      setSuccess('¡Email verificado correctamente!');
-      setShowEmailVerification(false);
-    } catch (error) {
-      console.error('Error en verificación:', error);
-      setError('Error al verificar el email. Intenta nuevamente.');
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -113,19 +89,11 @@ export const Register = () => {
         }),
       });
 
-      // Registro exitoso
-      setRegisteredUserId(data.user.id);
-
-      // Mostrar opción de verificación de email
+      // Registro exitoso (respuesta uniforme: no revela si el email ya existía)
       setShowEmailVerification(true);
-      setSuccess('¡Cuenta creada exitosamente! ');
-
-      // Iniciar verificación de email automáticamente
-      await initiateEmailVerification(data.user.id);
+      setSuccess(data.message || '¡Cuenta creada exitosamente!');
     } catch (error) {
-      if (error instanceof ApiError && error.statusCode === 409) {
-        setError('Este email ya está registrado. ¿Olvidaste tu contraseña?');
-      } else if (error instanceof ApiError && error.statusCode === 400) {
+      if (error instanceof ApiError && error.statusCode === 400) {
         setError('Datos inválidos. Verifica la información ingresada.');
       } else {
         setError(error?.message || 'Error al crear la cuenta. Intenta nuevamente.');
@@ -140,16 +108,6 @@ export const Register = () => {
     navigate('/login', {
       state: { message: 'Cuenta creada exitosamente. Ahora puedes iniciar sesión.' },
     });
-  };
-
-  // 🆕 Reenviar verificación de email
-  const handleResendVerification = async () => {
-    if (!registeredUserId) return;
-
-    setIsLoading(true);
-    setError('');
-    await initiateEmailVerification(registeredUserId);
-    setIsLoading(false);
   };
 
   return (
@@ -170,23 +128,7 @@ export const Register = () => {
             {success}
             {showEmailVerification && (
               <div className="verification-actions">
-                <p>¿No recibiste el email?</p>
-                <button
-                  type="button"
-                  className="resend-button"
-                  onClick={handleResendVerification}
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Enviando...' : 'Reenviar verificación'}
-                </button>
-                <button
-                  type="button"
-                  className="verify-now-button"
-                  onClick={() => verifyEmail(registeredUserId)}
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Verificando...' : 'Verificar ahora'}
-                </button>
+                <p>Revisa tu bandeja de entrada para verificar tu email.</p>
               </div>
             )}
           </div>
@@ -198,11 +140,9 @@ export const Register = () => {
             {error && (
               <div className="error-message">
                 {error}
-                {error.includes('ya está registrado') && (
-                  <div className="error-actions">
-                    <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
-                  </div>
-                )}
+                <div className="error-actions">
+                  <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+                </div>
               </div>
             )}
 
