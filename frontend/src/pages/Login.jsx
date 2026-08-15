@@ -281,7 +281,7 @@ export const Login = () => {
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
                 disabled={isLoading}
-                minLength={6}
+                minLength={8}
               />
 
               <div className="reset-actions">

@@ -127,8 +127,8 @@ export const Account = () => {
         throw new Error('Las contraseñas no coinciden');
       }
 
-      if (passwordData.newPassword.length < 6) {
-        throw new Error('La nueva contraseña debe tener al menos 6 caracteres');
+      if (passwordData.newPassword.length < 8) {
+        throw new Error('La nueva contraseña debe tener al menos 8 caracteres');
       }
 
       if (!user?.id) throw new Error('No hay usuario logueado');

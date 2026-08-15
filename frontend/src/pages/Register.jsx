@@ -43,7 +43,7 @@ export const Register = () => {
   // Iniciar verificación de email
   const initiateEmailVerification = async (userId) => {
     try {
-      await apiClient(`/users/${userId}/verify-email`, { method: 'POST' });
+      await apiClient(`/auth/${userId}/verify-email`, { method: 'POST' });
       setSuccess('Email de verificación enviado. Revisa tu bandeja de entrada.');
     } catch (error) {
       console.error('Error en verificación:', error);
@@ -54,7 +54,7 @@ export const Register = () => {
   // Verificar email inmediatamente (simulación)
   const verifyEmail = async (userId) => {
     try {
-      await apiClient(`/users/${userId}/verify-email`, { method: 'PATCH' });
+      await apiClient(`/auth/${userId}/verify-email`, { method: 'PATCH' });
       setSuccess('¡Email verificado correctamente!');
       setShowEmailVerification(false);
     } catch (error) {
@@ -82,8 +82,8 @@ export const Register = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+    if (formData.password.length < 8) {
+      setError('La contraseña debe tener al menos 8 caracteres');
       setIsLoading(false);
       return;
     }
@@ -103,7 +103,7 @@ export const Register = () => {
         return;
       }
 
-      const data = await apiClient('/users/register', {
+      const data = await apiClient('/auth/register', {
         method: 'POST',
         body: JSON.stringify({
           email: formData.email,
@@ -114,14 +114,14 @@ export const Register = () => {
       });
 
       // Registro exitoso
-      setRegisteredUserId(data.id);
+      setRegisteredUserId(data.user.id);
 
       // Mostrar opción de verificación de email
       setShowEmailVerification(true);
       setSuccess('¡Cuenta creada exitosamente! ');
 
       // Iniciar verificación de email automáticamente
-      await initiateEmailVerification(data.id);
+      await initiateEmailVerification(data.user.id);
     } catch (error) {
       if (error instanceof ApiError && error.statusCode === 409) {
         setError('Este email ya está registrado. ¿Olvidaste tu contraseña?');
@@ -246,7 +246,7 @@ export const Register = () => {
                 onChange={(e) => handleChange('password', e.target.value)}
                 required
                 disabled={isLoading}
-                minLength={6}
+                minLength={8}
               />
 
               <Input
@@ -257,7 +257,7 @@ export const Register = () => {
                 onChange={(e) => handleChange('confirmPassword', e.target.value)}
                 required
                 disabled={isLoading}
-                minLength={6}
+                minLength={8}
               />
 
               <div className="terms-options">
