@@ -24,10 +24,10 @@ import { envValidationSchema } from './config/env.validation';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         migrations: [__dirname + '/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations',
-        migrationsRun: configService.get('DB_MIGRATIONS_RUN') === 'true',
+        migrationsRun: [true, 'true'].includes(configService.get('DB_MIGRATIONS_RUN') ?? false),
         synchronize:
           configService.get('NODE_ENV') !== 'production' &&
-          configService.get('DB_SYNCHRONIZE') === 'true',
+          [true, 'true'].includes(configService.get('DB_SYNCHRONIZE') ?? false),
         logging: configService.get('NODE_ENV') !== 'production',
       }),
       inject: [ConfigService],

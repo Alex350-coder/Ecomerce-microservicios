@@ -12,6 +12,7 @@ y formato de error estándar.
 | `/auth`      | `AUTH_SERVICE_URL`  | auth-service   |
 | `/users`     | `USER_SERVICE_URL`  | user-service   |
 | `/products`  | `PRODUCT_SERVICE_URL` | product-service |
+| `/categories` | `PRODUCT_SERVICE_URL` | product-service |
 | `/cart`      | `CART_SERVICE_URL`  | cart-service   |
 | `/orders`    | `ORDER_SERVICE_URL` | order-service  |
 | `/inventory` | `INVENTORY_SERVICE_URL` | inventory-service |
@@ -38,7 +39,8 @@ Cualquier otro prefijo no mapeado devuelve `404 ROUTE_NOT_FOUND`.
 - **JWT (edge)**: verificación previa al proxy. Rutas públicas no requieren
   token: `GET /health`, `GET /health/ready`, `POST /auth/login`,
   `POST /auth/register`, `POST /auth/refresh`, `POST /auth/logout`,
-  `POST /auth/forgot-password`, `POST /auth/reset-password`, `GET /products*`.
+  `POST /auth/forgot-password`, `POST /auth/reset-password`, `GET /products*`,
+  `GET /categories*`.
   `POST /auth/refresh` y `POST /auth/logout` son públicas porque operan con la
   cookie httpOnly (no hay token en el navegador); el refresh valida la cookie
   y emite un access token nuevo, y el logout revoca el refresh.

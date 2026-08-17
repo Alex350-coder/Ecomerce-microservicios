@@ -3,6 +3,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { envValidationSchema } from './config/env.validation';
 import { HealthModule } from './health/health.module';
+import { AuthModule } from './auth/auth.module';
+import { CategoriesModule } from './categories/categories.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -24,11 +27,15 @@ import { HealthModule } from './health/health.module';
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         migrations: [__dirname + '/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations',
-        synchronize: configService.get<boolean>('DB_SYNCHRONIZE') === true,
+        migrationsRun: [true, 'true'].includes(configService.get('DB_MIGRATIONS_RUN') ?? false),
+        synchronize: [true, 'true'].includes(configService.get('DB_SYNCHRONIZE') ?? false),
         logging: false,
       }),
     }),
     HealthModule,
+    AuthModule,
+    CategoriesModule,
+    ProductsModule,
   ],
 })
 export class AppModule {}

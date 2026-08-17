@@ -132,6 +132,8 @@ services:
       DB_PASSWORD: ${PRODUCT_DB_PASSWORD:?set PRODUCT_DB_PASSWORD en .env}
       DB_DATABASE: product_db
       DB_SYNCHRONIZE: "false"
+      DB_MIGRATIONS_RUN: "true"
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET en .env}
     depends_on:
       mysql:
         condition: service_healthy

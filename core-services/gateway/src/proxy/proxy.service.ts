@@ -62,7 +62,7 @@ export class ProxyService {
 
   async forward(req: Request, res: Response): Promise<void> {
     const requestId = (req.headers[REQUEST_ID_HEADER] as string) ?? '';
-    const prefix = (req.originalUrl.split('/')[1] ?? '').toLowerCase();
+    const prefix = (req.originalUrl.split('?')[0].split('/')[1] ?? '').toLowerCase();
     const baseUrl = this.resolveTarget(prefix);
 
     if (!baseUrl) {

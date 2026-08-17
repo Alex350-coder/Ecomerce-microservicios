@@ -11,4 +11,7 @@ export const envValidationSchema = Joi.object({
   DB_PASSWORD: Joi.string().required(),
   DB_DATABASE: Joi.string().required(),
   DB_SYNCHRONIZE: Joi.boolean().default(false),
+
+  JWT_SECRET: Joi.string().min(16).required(),
+  INVENTORY_SERVICE_URL: Joi.string().uri().default('http://localhost:3006'),
 });
