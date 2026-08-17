@@ -5,7 +5,7 @@ import { CartProvider, useCart } from './CartContext';
 
 const wrapper = ({ children }: { children: ReactNode }) => <CartProvider>{children}</CartProvider>;
 
-describe('CartContext', () => {
+describe('CartContext (localStorage mode)', () => {
   beforeEach(() => {
     localStorage.clear();
   });
@@ -16,6 +16,7 @@ describe('CartContext', () => {
     expect(result.current.items).toEqual([]);
     expect(result.current.totalItems).toBe(0);
     expect(result.current.totalPrice).toBe(0);
+    expect(result.current.isLoading).toBe(false);
   });
 
   it('addItem adds a new product', () => {
@@ -25,7 +26,9 @@ describe('CartContext', () => {
       result.current.addItem({ id: 'p1', name: 'iPhone', price: 999 });
     });
 
-    expect(result.current.items).toEqual([{ id: 'p1', name: 'iPhone', price: 999, quantity: 1 }]);
+    expect(result.current.items).toEqual([
+      { id: 'p1', productId: 'p1', name: 'iPhone', price: 999, quantity: 1 },
+    ]);
     expect(result.current.totalItems).toBe(1);
     expect(result.current.totalPrice).toBe(999);
   });
@@ -38,11 +41,13 @@ describe('CartContext', () => {
       result.current.addItem({ id: 'p1', name: 'iPhone', price: 999 });
     });
 
-    expect(result.current.items).toEqual([{ id: 'p1', name: 'iPhone', price: 999, quantity: 2 }]);
+    expect(result.current.items).toEqual([
+      { id: 'p1', productId: 'p1', name: 'iPhone', price: 999, quantity: 2 },
+    ]);
     expect(result.current.totalPrice).toBe(1998);
   });
 
-  it('removeItem deletes the product', () => {
+  it('removeItem deletes the product by productId', () => {
     const { result } = renderHook(() => useCart(), { wrapper });
 
     act(() => {
@@ -51,7 +56,9 @@ describe('CartContext', () => {
       result.current.removeItem('p1');
     });
 
-    expect(result.current.items).toEqual([{ id: 'p2', name: 'MacBook', price: 1999, quantity: 1 }]);
+    expect(result.current.items).toEqual([
+      { id: 'p2', productId: 'p2', name: 'MacBook', price: 1999, quantity: 1 },
+    ]);
   });
 
   it('updateQuantity changes quantity and clamps below 1', () => {
@@ -60,6 +67,11 @@ describe('CartContext', () => {
     act(() => {
       result.current.addItem({ id: 'p1', name: 'iPhone', price: 999 });
       result.current.updateQuantity('p1', 3);
+    });
+
+    expect(result.current.items[0]?.quantity).toBe(3);
+
+    act(() => {
       result.current.updateQuantity('p1', 0);
     });
 
@@ -85,18 +97,24 @@ describe('CartContext', () => {
     });
 
     const stored = JSON.parse(localStorage.getItem('cart-items') || '[]');
-    expect(stored).toEqual([{ id: 'p1', name: 'iPhone', price: 999, quantity: 1 }]);
+    expect(stored).toEqual([
+      { id: 'p1', productId: 'p1', name: 'iPhone', price: 999, quantity: 1 },
+    ]);
   });
 
   it('hydrates from localStorage on mount', () => {
     localStorage.setItem(
       'cart-items',
-      JSON.stringify([{ id: 'p1', name: 'iPhone', price: 999, quantity: 2 }]),
+      JSON.stringify([
+        { id: 'p1', productId: 'p1', name: 'iPhone', price: 999, quantity: 2 },
+      ]),
     );
 
     const { result } = renderHook(() => useCart(), { wrapper });
 
-    expect(result.current.items).toEqual([{ id: 'p1', name: 'iPhone', price: 999, quantity: 2 }]);
+    expect(result.current.items).toEqual([
+      { id: 'p1', productId: 'p1', name: 'iPhone', price: 999, quantity: 2 },
+    ]);
     expect(result.current.totalItems).toBe(2);
   });
 });
