@@ -4,12 +4,24 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
+import {
+  fetchCart,
+  addToCart as apiAddToCart,
+  updateCartItem as apiUpdateCartItem,
+  removeCartItem as apiRemoveCartItem,
+  clearCartApi,
+  mergeGuestCart,
+  type CartItemDto,
+} from '../api/cart';
+import { getAccessToken } from '../api/auth';
 
 export interface CartItem {
   id: string;
+  productId: string;
   name: string;
   price: number;
   quantity: number;
@@ -29,13 +41,14 @@ interface CartContextValue {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
+  isLoading: boolean;
 }
 
 const CART_STORAGE_KEY = 'cart-items';
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
-function loadCart(): CartItem[] {
+function loadGuestCart(): CartItem[] {
   try {
     const raw = localStorage.getItem(CART_STORAGE_KEY);
     if (!raw) return [];
@@ -46,39 +59,148 @@ function loadCart(): CartItem[] {
   }
 }
 
+function mapApiItemToCartItem(item: CartItemDto): CartItem {
+  return {
+    id: item.id,
+    productId: item.productId,
+    name: item.productName,
+    price: item.price,
+    quantity: item.quantity,
+  };
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(loadCart);
+  const [items, setItems] = useState<CartItem[]>(loadGuestCart);
+  const [isLoading, setIsLoading] = useState(false);
+  const isAuthenticated = Boolean(getAccessToken());
+  const hasSyncedRef = useRef(false);
 
   useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+    if (!isAuthenticated || hasSyncedRef.current) return;
 
-  const addItem = useCallback((item: AddCartItemInput) => {
-    setItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
-      if (existing) {
-        return prev.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i));
+    const syncGuestCart = async () => {
+      setIsLoading(true);
+      try {
+        const guestItems = loadGuestCart();
+        if (guestItems.length > 0) {
+          const merged = await mergeGuestCart(
+            guestItems.map((i) => ({
+              productId: i.productId,
+              productName: i.name,
+              price: i.price,
+              quantity: i.quantity,
+            })),
+          );
+          setItems(merged.items.map(mapApiItemToCartItem));
+          localStorage.removeItem(CART_STORAGE_KEY);
+        } else {
+          const cart = await fetchCart();
+          setItems(cart.items.map(mapApiItemToCartItem));
+        }
+        hasSyncedRef.current = true;
+      } catch {
+        // Keep guest cart items if API fails
+      } finally {
+        setIsLoading(false);
       }
-      return [...prev, { ...item, quantity: 1 }];
-    });
-  }, []);
+    };
 
-  const removeItem = useCallback((id: string) => {
-    setItems((prev) => prev.filter((i) => i.id !== id));
-  }, []);
+    void syncGuestCart();
+  }, [isAuthenticated]);
 
-  const updateQuantity = useCallback((id: string, quantity: number) => {
-    setItems((prev) =>
-      prev.map((i) => {
-        if (i.id !== id) return i;
-        return { ...i, quantity: Math.max(1, quantity) };
-      }),
-    );
-  }, []);
+  useEffect(() => {
+    if (!isAuthenticated) {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    }
+  }, [items, isAuthenticated]);
 
-  const clearCart = useCallback(() => {
-    setItems([]);
-  }, []);
+  const addItem = useCallback(
+    async (item: AddCartItemInput) => {
+      if (!isAuthenticated) {
+        setItems((prev) => {
+          const existing = prev.find((i) => i.productId === item.id);
+          if (existing) {
+            return prev.map((i) =>
+              i.productId === item.id ? { ...i, quantity: i.quantity + 1 } : i,
+            );
+          }
+          return [...prev, { id: item.id, productId: item.id, name: item.name, price: item.price, quantity: 1 }];
+        });
+        return;
+      }
+
+      try {
+        const cart = await apiAddToCart({
+          productId: item.id,
+          productName: item.name,
+          price: item.price,
+          quantity: 1,
+        });
+        setItems(cart.items.map(mapApiItemToCartItem));
+      } catch {
+        // Silently fail - item not added
+      }
+    },
+    [isAuthenticated],
+  );
+
+  const removeItem = useCallback(
+    async (id: string) => {
+      if (!isAuthenticated) {
+        setItems((prev) => prev.filter((i) => i.productId !== id));
+        return;
+      }
+
+      try {
+        const item = items.find((i) => i.productId === id);
+        if (item) {
+          const cart = await apiRemoveCartItem(item.id);
+          setItems(cart.items.map(mapApiItemToCartItem));
+        }
+      } catch {
+        // Silently fail
+      }
+    },
+    [isAuthenticated, items],
+  );
+
+  const updateQuantity = useCallback(
+    async (id: string, quantity: number) => {
+      const clampedQty = Math.max(1, quantity);
+
+      if (!isAuthenticated) {
+        setItems((prev) =>
+          prev.map((i) => (i.productId === id ? { ...i, quantity: clampedQty } : i)),
+        );
+        return;
+      }
+
+      try {
+        const item = items.find((i) => i.productId === id);
+        if (item) {
+          const cart = await apiUpdateCartItem(item.id, clampedQty);
+          setItems(cart.items.map(mapApiItemToCartItem));
+        }
+      } catch {
+        // Silently fail
+      }
+    },
+    [isAuthenticated, items],
+  );
+
+  const clearCart = useCallback(async () => {
+    if (!isAuthenticated) {
+      setItems([]);
+      return;
+    }
+
+    try {
+      await clearCartApi();
+      setItems([]);
+    } catch {
+      // Silently fail
+    }
+  }, [isAuthenticated]);
 
   const totalItems = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
 
@@ -96,8 +218,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem,
       updateQuantity,
       clearCart,
+      isLoading,
     }),
-    [items, totalItems, totalPrice, addItem, removeItem, updateQuantity, clearCart],
+    [items, totalItems, totalPrice, addItem, removeItem, updateQuantity, clearCart, isLoading],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
