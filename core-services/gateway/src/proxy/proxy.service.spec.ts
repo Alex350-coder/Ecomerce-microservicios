@@ -87,6 +87,25 @@ describe('ProxyService', () => {
     expect(res.send).toHaveBeenCalledWith('{"token":"abc"}');
   });
 
+  it('reenvía URLs con query string preservando el prefijo', async () => {
+    routes.length = 0;
+    routes.push({
+      method: 'GET',
+      url: '/products?isFeatured=true&sort=rating&limit=3',
+      status: 200,
+      body: '{"data":[]}',
+    });
+
+    const service = makeService({ PRODUCT_SERVICE_URL: `http://localhost:${port}` });
+    const req = makeReq('GET', '/products?isFeatured=true&sort=rating&limit=3');
+    const res = makeRes();
+
+    await service.forward(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith('{"data":[]}');
+  });
+
   it('propaga X-User-Id/X-User-Role/X-Request-Id al upstream', async () => {
     routes.length = 0;
     routes.push({ method: 'GET', url: '/cart/me', status: 200, body: '{}' });
