@@ -1,33 +1,38 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MainLayout } from '../../templates/MainLayout';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { Link } from 'react-router-dom';
 import '../../styles/pages/FastLinks/Suport.css';
 
+interface Faq {
+  question: string;
+  answer: string;
+}
+
+const faqs: Faq[] = [
+  {
+    question: '¿Cuánto tiempo tarda el envío?',
+    answer: 'Los envíos estándar tardan 3-5 días hábiles. Express 1-2 días.',
+  },
+  {
+    question: '¿Hacen envíos internacionales?',
+    answer: 'Sí, realizamos envíos a toda Latinoamérica con costos variables.',
+  },
+  {
+    question: '¿Qué métodos de pago aceptan?',
+    answer: 'Aceptamos tarjetas de crédito/débito, PayPal y transferencias bancarias.',
+  },
+  {
+    question: '¿Puedo cambiar mi pedido?',
+    answer: 'Sí, puedes realizar cambios dentro de las primeras 24 horas después de la compra.',
+  },
+];
+
 export const Support = () => {
-  const [activeFaq, setActiveFaq] = useState(null);
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
-  const faqs = [
-    {
-      question: '¿Cuánto tiempo tarda el envío?',
-      answer: 'Los envíos estándar tardan 3-5 días hábiles. Express 1-2 días.',
-    },
-    {
-      question: '¿Hacen envíos internacionales?',
-      answer: 'Sí, realizamos envíos a toda Latinoamérica con costos variables.',
-    },
-    {
-      question: '¿Qué métodos de pago aceptan?',
-      answer: 'Aceptamos tarjetas de crédito/débito, PayPal y transferencias bancarias.',
-    },
-    {
-      question: '¿Puedo cambiar mi pedido?',
-      answer: 'Sí, puedes realizar cambios dentro de las primeras 24 horas después de la compra.',
-    },
-  ];
-
-  const toggleFaq = (index) => {
+  const toggleFaq = (index: number) => {
     setActiveFaq(activeFaq === index ? null : index);
   };
 
