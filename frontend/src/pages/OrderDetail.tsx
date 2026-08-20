@@ -96,7 +96,9 @@ export const OrderDetail = () => {
     <MainLayout>
       <div className="orders-page">
         <div className="order-detail-header">
-          <Link to="/orders" className="back-link">Volver a pedidos</Link>
+          <Link to="/orders" className="back-link">
+            Volver a pedidos
+          </Link>
           <h1>Pedido #{order.id.slice(0, 8)}</h1>
           <span className={`order-status ${STATUS_COLORS[order.status]}`}>
             {STATUS_LABELS[order.status]}
@@ -104,7 +106,9 @@ export const OrderDetail = () => {
         </div>
 
         {error && (
-          <div className="orders-error" role="alert">{error}</div>
+          <div className="orders-error" role="alert">
+            {error}
+          </div>
         )}
 
         <div className="order-detail-content">
@@ -115,7 +119,9 @@ export const OrderDetail = () => {
                 <div key={item.id} className="order-item">
                   <div className="item-info">
                     <span className="item-name">{item.productName}</span>
-                    <span className="item-qty">x{item.quantity} a ${item.price.toFixed(2)}</span>
+                    <span className="item-qty">
+                      x{item.quantity} a ${item.price.toFixed(2)}
+                    </span>
                   </div>
                   <span className="item-price">${item.lineTotal.toFixed(2)}</span>
                 </div>
@@ -128,11 +134,17 @@ export const OrderDetail = () => {
               <h2>Direccion de envio</h2>
               {order.addressSnapshot && (
                 <div className="address-info">
-                  <p><strong>{order.addressSnapshot.fullName}</strong></p>
+                  <p>
+                    <strong>{order.addressSnapshot.fullName}</strong>
+                  </p>
                   <p>{order.addressSnapshot.address}</p>
-                  <p>{order.addressSnapshot.city}, {order.addressSnapshot.postalCode}</p>
+                  <p>
+                    {order.addressSnapshot.city}, {order.addressSnapshot.postalCode}
+                  </p>
                   <p>{order.addressSnapshot.country}</p>
-                  <p>{order.addressSnapshot.email} - {order.addressSnapshot.phone}</p>
+                  <p>
+                    {order.addressSnapshot.email} - {order.addressSnapshot.phone}
+                  </p>
                 </div>
               )}
             </Card>

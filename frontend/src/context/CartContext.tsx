@@ -124,7 +124,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
               i.productId === item.id ? { ...i, quantity: i.quantity + 1 } : i,
             );
           }
-          return [...prev, { id: item.id, productId: item.id, name: item.name, price: item.price, quantity: 1 }];
+          return [
+            ...prev,
+            { id: item.id, productId: item.id, name: item.name, price: item.price, quantity: 1 },
+          ];
         });
         return;
       }

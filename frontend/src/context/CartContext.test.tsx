@@ -105,9 +105,7 @@ describe('CartContext (localStorage mode)', () => {
   it('hydrates from localStorage on mount', () => {
     localStorage.setItem(
       'cart-items',
-      JSON.stringify([
-        { id: 'p1', productId: 'p1', name: 'iPhone', price: 999, quantity: 2 },
-      ]),
+      JSON.stringify([{ id: 'p1', productId: 'p1', name: 'iPhone', price: 999, quantity: 2 }]),
     );
 
     const { result } = renderHook(() => useCart(), { wrapper });
