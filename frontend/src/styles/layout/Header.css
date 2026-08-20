@@ -70,15 +70,106 @@
 /* Responsive */
 @media (max-width: 768px) {
   .header__container {
-    flex-direction: column;
-    padding: 1rem;
-    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+    gap: 0.75rem;
   }
-  
+
   .header__search {
+    order: 3;
     max-width: none;
     width: 100%;
   }
+
+  .header__nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 280px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--bg-card);
+    border-left: 1px solid var(--border-color);
+    padding: var(--spacing-lg);
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    z-index: 200;
+    overflow-y: auto;
+  }
+
+  .header__nav--open {
+    transform: translateX(0);
+  }
+
+  .header__nav > * {
+    width: 100%;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .header__nav > .user-menu,
+  .header__nav > a {
+    display: block;
+  }
+
+  .header__nav .user-dropdown {
+    position: static;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    box-shadow: none;
+    border: none;
+    margin-top: 0.25rem;
+  }
+
+  .header__hamburger {
+    display: flex;
+    order: 2;
+    margin-left: auto;
+  }
+
+  .header__nav-overlay {
+    display: block;
+  }
+}
+
+/* Hamburger button — hidden on desktop */
+.header__hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.header__hamburger span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 1px;
+  transition: all 0.25s ease;
+  transform-origin: center;
+}
+
+.header__hamburger--open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.header__hamburger--open span:nth-child(2) {
+  opacity: 0;
+}
+
+.header__hamburger--open span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
 }
 
 /* 🆕 Estilos para el menú de usuario */
@@ -141,21 +232,4 @@
 
 .logout-button:hover {
   background-color: rgba(220, 53, 69, 0.1);
-}
-
-/* 🆕 Responsive */
-@media (max-width: 768px) {
-  .user-dropdown {
-    position: fixed;
-    top: auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    border-radius: 12px 12px 0 0;
-    transform: translateY(100%);
-  }
-  
-  .user-menu:hover .user-dropdown {
-    transform: translateY(0);
-  }
 }

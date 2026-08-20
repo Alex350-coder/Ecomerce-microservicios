@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Navbar } from './Navbar';
@@ -10,9 +10,9 @@ import '../../styles/layout/Header.css';
 export const Header = () => {
   const { user, isAuthenticated, isInitializing, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  // Obtener nombre para mostrar
-  const getUserDisplayName = () => {
+  const getUserDisplayName = (): string => {
     if (!user) return 'Usuario';
 
     if (user.firstName && user.lastName) {
@@ -26,12 +26,11 @@ export const Header = () => {
     return 'Usuario';
   };
 
-  // Manejar logout
   const handleLogout = async () => {
     await logout();
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     const query = searchQuery.trim();
     if (query) {
@@ -39,12 +38,12 @@ export const Header = () => {
     }
   };
 
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <div className="header-container">
-      {/* Sección superior del Header */}
       <header className="header-main">
         <div className="header__container">
-          {/* Logo */}
           <Link to="/">
             <div className="header__logo">
               <div className="logo__icon">E</div>
@@ -52,7 +51,6 @@ export const Header = () => {
             </div>
           </Link>
 
-          {/* Barra de búsqueda */}
           <form className="header__search" onSubmit={handleSearch} role="search">
             <Input
               type="text"
@@ -64,12 +62,21 @@ export const Header = () => {
             />
           </form>
 
-          {/* Navegación */}
-          <nav className="header__nav">
+          <button
+            className={`header__hamburger ${menuOpen ? 'header__hamburger--open' : ''}`}
+            onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={menuOpen}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+
+          <nav className={`header__nav ${menuOpen ? 'header__nav--open' : ''}`}>
             <CartIcon />
 
             {isInitializing ? null : isAuthenticated ? (
-              // MENÚ PARA USUARIO LOGUEADO
               <div className="user-menu">
                 <Link to="/account">
                   <Button variant="ghost" size="sm" className="user-button">
@@ -77,31 +84,35 @@ export const Header = () => {
                   </Button>
                 </Link>
                 <div className="user-dropdown">
-                  <Link to="/account" className="dropdown-item">
+                  <Link to="/account" className="dropdown-item" onClick={closeMenu}>
                     Mi Cuenta
                   </Link>
-                  <Link to="/orders" className="dropdown-item">
+                  <Link to="/orders" className="dropdown-item" onClick={closeMenu}>
                     Mis Pedidos
                   </Link>
+                  {user?.role === 'admin' && (
+                    <Link to="/admin" className="dropdown-item" onClick={closeMenu}>
+                      Panel Admin
+                    </Link>
+                  )}
                   <button onClick={handleLogout} className="dropdown-item logout-button">
                     Cerrar Sesión
                   </button>
                 </div>
               </div>
             ) : (
-              // BOTONES PARA USUARIO NO LOGUEADO
               <>
-                <Link to="/account">
+                <Link to="/account" onClick={closeMenu}>
                   <Button variant="ghost" size="sm">
                     👤 Cuenta
                   </Button>
                 </Link>
-                <Link to="/login">
+                <Link to="/login" onClick={closeMenu}>
                   <Button variant="outline" size="sm">
                     Login
                   </Button>
                 </Link>
-                <Link to="/register">
+                <Link to="/register" onClick={closeMenu}>
                   <Button variant="primary" size="sm">
                     Registrarse
                   </Button>
@@ -112,7 +123,6 @@ export const Header = () => {
         </div>
       </header>
 
-      {/* Navbar integrado */}
       <Navbar />
     </div>
   );
