@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { AuthLayout } from '../templates/AuthLayout';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -7,8 +7,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { apiClient, ApiError } from '../api/client';
 import '../styles/pages/Register.css';
 
+interface RegisterForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  acceptTerms: boolean;
+}
+
 export const Register = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<RegisterForm>({
     firstName: '',
     lastName: '',
     email: '',
@@ -22,30 +31,25 @@ export const Register = () => {
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (field, value) => {
+  const handleChange = <K extends keyof RegisterForm>(field: K, value: RegisterForm[K]) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
-    // Limpiar mensajes cuando el usuario empiece a escribir
     if (error) setError('');
     if (success) setSuccess('');
   };
 
-  // Verificar si el email ya existe antes de registrar
-  const checkEmailExists = async () => {
-    // En un sistema completo, aquí harías una petición para verificar
-    // Por ahora simulamos que no existe
+  const checkEmailExists = async (): Promise<boolean> => {
     return false;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
     setSuccess('');
 
-    // Validaciones mejoradas
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
       setIsLoading(false);
@@ -71,15 +75,14 @@ export const Register = () => {
     }
 
     try {
-      // Verificar si el email ya existe (simulación)
-      const emailExists = await checkEmailExists(formData.email);
+      const emailExists = await checkEmailExists();
       if (emailExists) {
         setError('Este email ya está registrado. ¿Olvidaste tu contraseña?');
         setIsLoading(false);
         return;
       }
 
-      const data = await apiClient('/auth/register', {
+      const data = await apiClient<{ message?: string }>('/auth/register', {
         method: 'POST',
         body: JSON.stringify({
           email: formData.email,
@@ -89,21 +92,21 @@ export const Register = () => {
         }),
       });
 
-      // Registro exitoso (respuesta uniforme: no revela si el email ya existía)
       setShowEmailVerification(true);
       setSuccess(data.message || '¡Cuenta creada exitosamente!');
-    } catch (error) {
-      if (error instanceof ApiError && error.statusCode === 400) {
+    } catch (err) {
+      if (err instanceof ApiError && err.statusCode === 400) {
         setError('Datos inválidos. Verifica la información ingresada.');
+      } else if (err instanceof Error) {
+        setError(err.message || 'Error al crear la cuenta. Intenta nuevamente.');
       } else {
-        setError(error?.message || 'Error al crear la cuenta. Intenta nuevamente.');
+        setError('Error al crear la cuenta. Intenta nuevamente.');
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 🆕 Navegar al login
   const handleGoToLogin = () => {
     navigate('/login', {
       state: { message: 'Cuenta creada exitosamente. Ahora puedes iniciar sesión.' },
@@ -122,7 +125,6 @@ export const Register = () => {
           <p>Únete a nuestra comunidad</p>
         </div>
 
-        {/* 🆕 Mensaje de éxito */}
         {success && (
           <div className="success-message">
             {success}
@@ -134,7 +136,6 @@ export const Register = () => {
           </div>
         )}
 
-        {/* 🆕 Mostrar formulario solo si no hay registro exitoso */}
         {!showEmailVerification && (
           <>
             {error && (
@@ -225,7 +226,6 @@ export const Register = () => {
           </>
         )}
 
-        {/* 🆕 Acciones después del registro exitoso */}
         {showEmailVerification && (
           <div className="post-registration-actions">
             <Button onClick={handleGoToLogin} className="login-button">

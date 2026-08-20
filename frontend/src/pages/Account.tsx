@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { MainLayout } from '../templates/MainLayout';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -7,9 +7,26 @@ import { useAuth } from '../context/AuthContext';
 import { apiClient } from '../api/client';
 import '../styles/pages/Account.css';
 
+interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  country: string;
+  zipCode: string;
+}
+
+interface PasswordData {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 export const Account = () => {
   const { user, logout } = useAuth();
-  const [userData, setUserData] = useState({
+  const [userData, setUserData] = useState<UserData>({
     firstName: '',
     lastName: '',
     email: '',
@@ -25,15 +42,13 @@ export const Account = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Estados para cambiar contraseña
   const [showChangePassword, setShowChangePassword] = useState(false);
-  const [passwordData, setPasswordData] = useState({
+  const [passwordData, setPasswordData] = useState<PasswordData>({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
 
-  // Cargar datos del usuario al montar el componente
   useEffect(() => {
     if (user?.id) {
       fetchUserData(user.id);
@@ -42,33 +57,31 @@ export const Account = () => {
     }
   }, [user?.id]);
 
-  // Obtener datos del usuario desde el user-service
-  const fetchUserData = async (userId) => {
+  const fetchUserData = async (userId: string) => {
     try {
       setIsLoading(true);
-      const data = await apiClient(`/users/profile/${userId}`);
+      const data = await apiClient<UserData>(`/users/profile/${userId}`);
       setUserData((prev) => ({
         ...prev,
         firstName: data.firstName || '',
         lastName: data.lastName || '',
         email: data.email || '',
       }));
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (err) {
+      console.error('Error:', err);
       setError('Error al cargar datos del usuario');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleChange = (field, value) => {
+  const handleChange = (field: keyof UserData, value: string) => {
     setUserData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  // Actualizar perfil en el user-service
   const handleSave = async () => {
     try {
       setIsLoading(true);
@@ -77,7 +90,7 @@ export const Account = () => {
 
       if (!user?.id) throw new Error('No hay usuario logueado');
 
-      const updatedUser = await apiClient(`/users/profile/${user.id}`, {
+      const updatedUser = await apiClient<Partial<UserData>>(`/users/profile/${user.id}`, {
         method: 'PATCH',
         body: JSON.stringify({
           firstName: userData.firstName,
@@ -95,16 +108,19 @@ export const Account = () => {
 
       setSuccess('Perfil actualizado correctamente');
       setIsEditing(false);
-    } catch (error) {
-      console.error('Error:', error);
-      setError(error?.message || 'Error al actualizar perfil');
+    } catch (err) {
+      console.error('Error:', err);
+      if (err instanceof Error) {
+        setError(err.message || 'Error al actualizar perfil');
+      } else {
+        setError('Error al actualizar perfil');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    // Recargar datos originales desde el contexto
     setUserData((prev) => ({
       ...prev,
       firstName: user?.firstName || '',
@@ -116,7 +132,6 @@ export const Account = () => {
     setSuccess('');
   };
 
-  // Cambiar contraseña
   const handleChangePassword = async () => {
     try {
       setIsLoading(true);
@@ -148,21 +163,23 @@ export const Account = () => {
         newPassword: '',
         confirmPassword: '',
       });
-    } catch (error) {
-      console.error('Error:', error);
-      setError(error?.message || 'Error al cambiar contraseña');
+    } catch (err) {
+      console.error('Error:', err);
+      if (err instanceof Error) {
+        setError(err.message || 'Error al cambiar contraseña');
+      } else {
+        setError('Error al cambiar contraseña');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Cerrar sesión
   const handleLogout = async () => {
     await logout();
     window.location.href = '/login';
   };
 
-  // Verificación de email
   const handleVerifyEmail = async () => {
     try {
       setIsLoading(true);
@@ -173,9 +190,13 @@ export const Account = () => {
       await apiClient(`/auth/${user.id}/verify-email`, { method: 'PATCH' });
 
       setSuccess('Email verificado correctamente');
-    } catch (error) {
-      console.error('Error:', error);
-      setError(error?.message || 'Error al verificar email');
+    } catch (err) {
+      console.error('Error:', err);
+      if (err instanceof Error) {
+        setError(err.message || 'Error al verificar email');
+      } else {
+        setError('Error al verificar email');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -191,13 +212,11 @@ export const Account = () => {
           <p>Gestiona tu información personal y preferencias</p>
         </div>
 
-        {/* Mensajes de éxito/error */}
         {error && <div className="account-message error-message">{error}</div>}
 
         {success && <div className="account-message success-message">{success}</div>}
 
         <div className="account-content">
-          {/* Información Personal */}
           <Card className="account-section">
             <div className="section-header">
               <h2>Información Personal</h2>
@@ -270,7 +289,6 @@ export const Account = () => {
             </div>
           </Card>
 
-          {/* 🆕 Cambiar Contraseña */}
           {showChangePassword ? (
             <Card className="account-section">
               <div className="section-header">
@@ -347,7 +365,6 @@ export const Account = () => {
             </Card>
           )}
 
-          {/* Acciones de Cuenta */}
           <Card className="account-section">
             <h2>Acciones de Cuenta</h2>
             <div className="account-actions">

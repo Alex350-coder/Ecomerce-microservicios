@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { AuthLayout } from '../templates/AuthLayout';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -24,19 +24,18 @@ export const Login = () => {
   const location = useLocation();
   const { login } = useAuth();
 
-  // Mostrar mensaje de éxito si viene del registro
-  const successMessage = location.state?.message;
+  const successMessage = (location.state as { message?: string } | null)?.message;
 
-  const getErrorMessage = (err) => {
+  const getErrorMessage = (err: unknown): string => {
     if (err instanceof ApiError) {
       if (err.statusCode === 401) return 'Credenciales inválidas. Verifica tu email y contraseña.';
       if (err.statusCode === 423) return 'Cuenta bloqueada. Contacta al administrador.';
     }
-    return err?.message || 'Error de conexión. Intenta nuevamente.';
+    if (err instanceof Error) return err.message;
+    return 'Error de conexión. Intenta nuevamente.';
   };
 
-  // SOLICITAR RECUPERACIÓN DE CONTRASEÑA
-  const handleForgotPassword = async (e) => {
+  const handleForgotPassword = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
@@ -57,8 +56,7 @@ export const Login = () => {
     }
   };
 
-  // RESTABLECER CONTRASEÑA CON TOKEN
-  const handleResetPassword = async (e) => {
+  const handleResetPassword = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
@@ -81,8 +79,7 @@ export const Login = () => {
     }
   };
 
-  // INICIAR SESIÓN
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
@@ -105,7 +102,6 @@ export const Login = () => {
     }
   };
 
-  // 🆕 CERRAR MODALES
   const closeModals = () => {
     setShowForgotPassword(false);
     setShowResetPassword(false);
@@ -128,7 +124,6 @@ export const Login = () => {
           <p>Accede a tu cuenta para continuar</p>
         </div>
 
-        {/* 🆕 MENSAJES DE ÉXITO/ERROR */}
         {successMessage && <div className="success-message">{successMessage}</div>}
 
         {success && <div className="success-message">{success}</div>}
@@ -150,7 +145,6 @@ export const Login = () => {
           </div>
         )}
 
-        {/* 🆕 FORMULARIO DE LOGIN PRINCIPAL */}
         {!showForgotPassword && !showResetPassword && (
           <form className="login-form" onSubmit={handleSubmit}>
             <Input
@@ -205,7 +199,6 @@ export const Login = () => {
           </form>
         )}
 
-        {/* 🆕 FORMULARIO DE RECUPERACIÓN DE CONTRASEÑA */}
         {showForgotPassword && (
           <div className="recovery-form">
             <h3>Recuperar Contraseña</h3>
@@ -256,7 +249,6 @@ export const Login = () => {
           </div>
         )}
 
-        {/* 🆕 FORMULARIO DE RESTABLECIMIENTO DE CONTRASEÑA */}
         {showResetPassword && (
           <div className="reset-form">
             <h3>Restablecer Contraseña</h3>
