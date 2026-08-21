@@ -8,6 +8,7 @@ import { OrderItem } from './entities/order-item.entity';
 import { Idempotency } from './entities/idempotency.entity';
 import { OrderStatus } from './enums/order-status.enum';
 import { BadRequestException, ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { RequestContextService } from '../common/request-context.service';
 
 type MockRepo<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -50,6 +51,7 @@ describe('OrdersService', () => {
         { provide: getRepositoryToken(Idempotency), useValue: idempotencyRepo },
         { provide: DataSource, useValue: {} },
         { provide: ConfigService, useValue: mockConfigService },
+        RequestContextService,
       ],
     }).compile();
 
@@ -200,6 +202,29 @@ describe('OrdersService', () => {
       } finally {
         global.fetch = originalFetch;
       }
+    });
+
+    it('should not create duplicate orders when retrying with same idempotency key', async () => {
+      const existingOrder = { id: 'order-123', userId: 'u1', items: [] };
+      idempotencyRepo.findOne!.mockResolvedValue({
+        key: 'retry-key',
+        resourceId: 'order-123',
+      });
+      orderRepo.findOne!.mockResolvedValue(existingOrder);
+
+      const result1 = await service.createOrder('u1', {
+        items: [{ productId: 'p1', productName: 'Test', price: 10, quantity: 1 }],
+        address: { fullName: 'Test', email: 'a@b.com', phone: '123', address: 'St', city: 'C', postalCode: '12345', country: 'US' },
+      }, 'retry-key');
+
+      const result2 = await service.createOrder('u1', {
+        items: [{ productId: 'p1', productName: 'Test', price: 10, quantity: 1 }],
+        address: { fullName: 'Test', email: 'a@b.com', phone: '123', address: 'St', city: 'C', postalCode: '12345', country: 'US' },
+      }, 'retry-key');
+
+      expect(result1.id).toBe('order-123');
+      expect(result2.id).toBe('order-123');
+      expect(orderRepo.create).not.toHaveBeenCalled();
     });
   });
 });
