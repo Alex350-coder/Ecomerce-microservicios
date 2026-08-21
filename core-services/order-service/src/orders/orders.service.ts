@@ -19,6 +19,7 @@ import { AdminUpdateOrderDto } from './dto/admin-update-order.dto';
 import { calculateOrderTotals } from './helpers/price-calculator';
 import { isValidTransition, canCancel } from './helpers/status-machine';
 import { RequestContextService } from '../common/request-context.service';
+import { fetchWithTimeout } from '../common/fetch-with-timeout';
 
 interface InventoryResponse {
   reservationId: string;
@@ -176,7 +177,7 @@ export class OrdersService {
     reservationId: string,
   ): Promise<InventoryResponse> {
     const requestId = this.requestContext.getRequestId();
-    const response = await fetch(`${this.inventoryUrl}/inventory/reserve`, {
+    const response = await fetchWithTimeout(`${this.inventoryUrl}/inventory/reserve`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -200,7 +201,7 @@ export class OrdersService {
     reservationId: string,
   ): Promise<void> {
     const requestId = this.requestContext.getRequestId();
-    const response = await fetch(`${this.inventoryUrl}/inventory/commit`, {
+    const response = await fetchWithTimeout(`${this.inventoryUrl}/inventory/commit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -222,7 +223,7 @@ export class OrdersService {
     reservationId: string,
   ): Promise<void> {
     const requestId = this.requestContext.getRequestId();
-    const response = await fetch(`${this.inventoryUrl}/inventory/release`, {
+    const response = await fetchWithTimeout(`${this.inventoryUrl}/inventory/release`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -246,7 +247,7 @@ export class OrdersService {
     const idempotencyKey = `order-${order.id}`;
     const requestId = this.requestContext.getRequestId();
 
-    const response = await fetch(`${this.paymentUrl}/payments/intents`, {
+    const response = await fetchWithTimeout(`${this.paymentUrl}/payments/intents`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

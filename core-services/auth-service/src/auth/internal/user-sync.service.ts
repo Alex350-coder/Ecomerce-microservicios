@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RequestContextService } from '../../common/request-context.service';
+import { fetchWithTimeout } from '../../common/fetch-with-timeout';
 
 export interface NewUserPayload {
   id: string;
@@ -27,7 +28,7 @@ export class UserSyncService {
 
     try {
       const requestId = this.requestContext.getRequestId();
-      const response = await fetch(`${url}/internal/users`, {
+      const response = await fetchWithTimeout(`${url}/internal/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

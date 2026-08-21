@@ -61,12 +61,13 @@ describe('UserSyncService', () => {
       .mockResolvedValue({ ok: false, status: 500 } as Response);
 
     await expect(service.notifyUserCreated(payload)).resolves.toBeUndefined();
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
   });
 
   it('tolerates a network failure without throwing', async () => {
-    jest.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('ECONNREFUSED'));
+    const fetchSpy = jest.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('ECONNREFUSED'));
 
     await expect(service.notifyUserCreated(payload)).resolves.toBeUndefined();
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
   });
 });

@@ -8,6 +8,7 @@ import { AddCartItemDto } from './dto/add-cart-item.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import { MergeCartDto } from './dto/merge-cart.dto';
 import { RequestContextService } from '../common/request-context.service';
+import { fetchWithTimeout } from '../common/fetch-with-timeout';
 
 @Injectable()
 export class CartService {
@@ -167,7 +168,7 @@ export class CartService {
   private async checkStock(productId: string, quantity: number): Promise<boolean> {
     try {
       const requestId = this.requestContext.getRequestId();
-      const response = await fetch(`${this.inventoryUrl}/inventory/${productId}`, {
+      const response = await fetchWithTimeout(`${this.inventoryUrl}/inventory/${productId}`, {
         headers: { 'x-request-id': requestId },
       });
       if (!response.ok) return true;
@@ -184,7 +185,7 @@ export class CartService {
   private async getMaxAvailable(productId: string, currentQty: number): Promise<number> {
     try {
       const requestId = this.requestContext.getRequestId();
-      const response = await fetch(`${this.inventoryUrl}/inventory/${productId}`, {
+      const response = await fetchWithTimeout(`${this.inventoryUrl}/inventory/${productId}`, {
         headers: { 'x-request-id': requestId },
       });
       if (!response.ok) return currentQty;
