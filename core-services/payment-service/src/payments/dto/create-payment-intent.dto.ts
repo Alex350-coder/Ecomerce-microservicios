@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   IsArray,
   IsEnum,
   IsInt,
@@ -9,6 +10,7 @@ import {
   IsString,
   IsUUID,
   Max,
+  MaxLength,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -24,8 +26,9 @@ class PaymentItemDto {
   @Max(100)
   quantity!: number;
 
-  @IsNumber()
-  @Min(0)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0.01)
+  @Max(999999.99)
   unitPrice!: number;
 }
 
@@ -34,19 +37,22 @@ export class CreatePaymentIntentDto {
   @IsNotEmpty()
   orderId!: string;
 
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0.01)
+  @Max(99999999.99)
   amount!: number;
 
   @IsEnum(PaymentMethod)
   method!: PaymentMethod;
 
   @IsArray()
+  @ArrayMaxSize(50)
   @ValidateNested({ each: true })
   @Type(() => PaymentItemDto)
   items!: PaymentItemDto[];
 
   @IsOptional()
-  @IsString()
+  @IsUUID()
+  @MaxLength(36)
   idempotencyKey?: string;
 }

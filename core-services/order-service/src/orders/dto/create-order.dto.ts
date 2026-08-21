@@ -1,7 +1,8 @@
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   IsArray,
-  IsEnum,
+  IsEmail,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -9,7 +10,9 @@ import {
   IsString,
   IsUUID,
   Max,
+  MaxLength,
   Min,
+  MinLength,
   ValidateNested,
 } from 'class-validator';
 
@@ -19,12 +22,13 @@ class OrderItemDto {
   productId!: string;
 
   @IsString()
-  @Min(1)
-  @Max(200)
+  @MinLength(1)
+  @MaxLength(200)
   productName!: string;
 
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0.01)
+  @Max(999999.99)
   price!: number;
 
   @IsInt()
@@ -35,43 +39,43 @@ class OrderItemDto {
 
 class AddressDto {
   @IsString()
-  @Min(1)
-  @Max(100)
+  @MinLength(1)
+  @MaxLength(100)
   fullName!: string;
 
-  @IsString()
-  @Min(1)
-  @Max(100)
+  @IsEmail()
+  @MaxLength(254)
   email!: string;
 
   @IsString()
-  @Min(1)
-  @Max(20)
+  @MinLength(1)
+  @MaxLength(20)
   phone!: string;
 
   @IsString()
-  @Min(1)
-  @Max(200)
+  @MinLength(1)
+  @MaxLength(200)
   address!: string;
 
   @IsString()
-  @Min(1)
-  @Max(100)
+  @MinLength(1)
+  @MaxLength(100)
   city!: string;
 
   @IsString()
-  @Min(1)
-  @Max(20)
+  @MinLength(1)
+  @MaxLength(20)
   postalCode!: string;
 
   @IsString()
-  @Min(1)
-  @Max(100)
+  @MinLength(1)
+  @MaxLength(100)
   country!: string;
 }
 
 export class CreateOrderDto {
   @IsArray()
+  @ArrayMaxSize(50)
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
   items!: OrderItemDto[];
@@ -82,9 +86,11 @@ export class CreateOrderDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(50)
   shippingMethod?: string;
 
   @IsOptional()
-  @IsString()
+  @IsUUID()
+  @MaxLength(36)
   idempotencyKey?: string;
 }

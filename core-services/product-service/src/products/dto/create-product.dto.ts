@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   IsBoolean,
   IsDate,
   IsInt,
@@ -26,6 +27,7 @@ export class CreateProductDto {
   @Type(() => Number)
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
+  @Max(999999.99)
   price!: number;
 
   @IsUUID()
@@ -34,11 +36,13 @@ export class CreateProductDto {
   @IsOptional()
   @IsString({ each: true })
   @MaxLength(500, { each: true })
+  @ArrayMaxSize(10)
   images?: string[];
 
   @IsOptional()
   @IsString({ each: true })
   @MaxLength(100, { each: true })
+  @ArrayMaxSize(20)
   features?: string[];
 
   @IsOptional()

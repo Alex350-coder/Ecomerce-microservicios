@@ -1,4 +1,15 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class AddCartItemDto {
   @IsUUID()
@@ -7,9 +18,13 @@ export class AddCartItemDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(200)
   productName!: string;
 
-  @IsNotEmpty()
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0.01)
+  @Max(999999.99)
   price!: number;
 
   @IsOptional()
