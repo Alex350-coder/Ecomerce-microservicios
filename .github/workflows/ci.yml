@@ -7,7 +7,7 @@ on:
 
 jobs:
   quality:
-    name: quality (${{ matrix.package.dir }})
+    name: quality (${{ matrix.dir }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -27,13 +27,11 @@ jobs:
             strict: true
           - dir: core-services/gateway
             strict: true
-          # auth-service: deuda preexistente de lint y tests (no-bloqueantes).
-          # typecheck y build SI bloquean.
           - dir: core-services/auth-service
-            strict: false
+            strict: true
           - dir: frontend
             strict: true
-            has-test: false
+            is-frontend: true
     steps:
       - uses: actions/checkout@v4
 
@@ -41,33 +39,45 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: ${{ matrix.package.dir }}/package-lock.json
+          cache-dependency-path: ${{ matrix.dir }}/package-lock.json
 
       - name: Alinear npm con los lockfiles (generados con npm 11)
         run: npm install -g npm@11.2.0
 
       - name: Instalar dependencias
-        working-directory: ${{ matrix.package.dir }}
+        working-directory: ${{ matrix.dir }}
         run: npm ci --no-audit --no-fund
 
       - name: Lint
-        working-directory: ${{ matrix.package.dir }}
+        working-directory: ${{ matrix.dir }}
         run: npm run lint
-        continue-on-error: ${{ !matrix.package.strict }}
+        continue-on-error: ${{ !matrix.strict }}
 
       - name: Typecheck
-        working-directory: ${{ matrix.package.dir }}
+        working-directory: ${{ matrix.dir }}
         run: npm run typecheck --if-present
 
       - name: Build
-        working-directory: ${{ matrix.package.dir }}
+        working-directory: ${{ matrix.dir }}
         run: npm run build
 
-      - name: Test
-        working-directory: ${{ matrix.package.dir }}
-        run: npm test -- --runInBand
-        if: ${{ matrix.package.has-test != false }}
-        continue-on-error: ${{ !matrix.package.strict }}
+      - name: Test with coverage (backend)
+        if: ${{ !matrix.is-frontend }}
+        working-directory: ${{ matrix.dir }}
+        run: npm run test:cov -- --runInBand
+
+      - name: Test with coverage (frontend)
+        if: ${{ matrix.is-frontend }}
+        working-directory: ${{ matrix.dir }}
+        run: npm run test:coverage
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.dir }}
+          path: ${{ matrix.dir }}/coverage/
+          retention-days: 7
 
   audit:
     name: audit (${{ matrix.dir }})

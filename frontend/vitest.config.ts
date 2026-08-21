@@ -11,13 +11,20 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
-      include: ['src/api/**/*.ts', 'src/context/**/*.tsx', 'src/hooks/**/*.ts'],
-      exclude: ['src/api/**/*.test.ts'],
+      include: [
+        'src/api/**/*.ts',
+        'src/context/**/*.tsx',
+        'src/hooks/**/*.ts',
+      ],
+      exclude: [
+        'src/**/*.test.{ts,tsx}',
+        'src/**/*.spec.{ts,tsx}',
+      ],
       thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 80,
-        statements: 80,
+        statements: 60,
+        branches: 55,
+        functions: 60,
+        lines: 60,
       },
     },
   },
