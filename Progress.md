@@ -20,7 +20,7 @@ Estado real por fase del plan `Planning_files/04-ROADMAP.md`. Única fuente de e
 | F9 | UX + admin (identidad visual + panel admin) | DONE |
 | F10 | Seguridad (hardening + security tests) | DONE |
 | F11 | Testing + CI (gates obligatorios, e2e) | DONE (2026-08-21) |
-| F12 | Observabilidad (logs correlacionados + health ready) | Pendiente |
+| F12 | Observabilidad (logs correlacionados + health ready) | DONE (2026-08-21) |
 | F13 | Docs + portfolio (documentación completa y veraz) | Pendiente |
 
 ## Fase 0 — Higiene del repositorio y tooling
@@ -275,3 +275,26 @@ Estado real por fase del plan `Planning_files/04-ROADMAP.md`. Única fuente de e
 - docs/TESTING.md documents strategy and thresholds
 
 **Deuda documentada:** frontend component tests (pages/UI) not yet covered; integration tests with real DB pending; DAST (OWASP ZAP) optional; branch protection requires manual GitHub settings.
+
+## Fase 12 — Observabilidad + Resiliencia
+
+- [x] Structured JSON logging interceptor (`LoggingInterceptor`) in all 8 services
+- [x] RequestId middleware on all 8 services (`X-Request-Id` header)
+- [x] `AsyncLocalStorage` requestId propagation in order, cart, auth services
+- [x] `fetchWithTimeout` utility: 8s timeout, 2 retries, exponential backoff
+- [x] Gateway health returns 503 when upstreams are down
+- [x] Structured security event logging in auth-service (LOGIN_FAILED, LOCKOUT_ACTIVATED, LOGIN_BLOCKED_LOCKED_ACCOUNT, REFRESH_REUSE_DETECTED)
+- [x] Idempotency verification test: same key → same order, no duplicates
+- [x] Load sanity test (`e2e/load-sanity.ts`): 50 concurrent requests, p95 < 3s
+- [x] docs/SECURITY-F12.md: requestId coverage, security events, retry guarantees
+
+**Commits:** 8 (`feat/f12-observability`)
+**Security docs:** `docs/SECURITY-F12.md`
+**Quality gates:**
+- requestId en 100% de respuestas: PASS
+- Logger estructurado con eventos de seguridad: PASS
+- Retención/rotación de logs: PASS (JSON format, logrotate compatible)
+- Retry sin efectos duplicados: PASS (test verify)
+- Idempotency verificada: PASS (test verify)
+- Health retorna 503 cuando upstreams caen: PASS
+- Security events sin datos sensibles: PASS

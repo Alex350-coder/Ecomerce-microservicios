@@ -7,6 +7,7 @@ import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { Idempotency } from './entities/idempotency.entity';
 import { OrderStatus } from './enums/order-status.enum';
+import { RequestContextService } from '../common/request-context.service';
 
 type MockRepo<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
@@ -69,6 +70,7 @@ describe('OrdersService - Saga execution', () => {
         { provide: getRepositoryToken(Idempotency), useValue: idempotencyRepo },
         { provide: DataSource, useValue: {} },
         { provide: ConfigService, useValue: mockConfigService },
+        RequestContextService,
       ],
     }).compile();
 
@@ -135,7 +137,10 @@ describe('OrdersService - Saga execution', () => {
 
     global.fetch = jest.fn()
       .mockResolvedValueOnce({ ok: true, json: async () => ({ reservationId: 'r1', items: [{ productId: 'p1', quantity: 2, available: true }] }) })
-      .mockRejectedValueOnce(new Error('Payment timeout')) as any;
+      .mockRejectedValueOnce(new Error('Payment timeout'))
+      .mockRejectedValueOnce(new Error('Payment timeout'))
+      .mockRejectedValueOnce(new Error('Payment timeout'))
+      .mockResolvedValueOnce({ ok: true }) as any;
 
     const result = await service.createOrder('u1', dto, 'key-1');
     expect(result.status).toBe(OrderStatus.FAILED);
@@ -145,6 +150,8 @@ describe('OrdersService - Saga execution', () => {
     buildMocks({ orderOverrides: { status: OrderStatus.FAILED } });
 
     global.fetch = jest.fn()
+      .mockRejectedValueOnce(new Error('ECONNREFUSED'))
+      .mockRejectedValueOnce(new Error('ECONNREFUSED'))
       .mockRejectedValueOnce(new Error('ECONNREFUSED')) as any;
 
     const result = await service.createOrder('u1', dto, 'key-1');

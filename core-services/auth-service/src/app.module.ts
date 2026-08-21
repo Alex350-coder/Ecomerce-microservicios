@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { HealthModule } from './health/health.module';
 import { envValidationSchema } from './config/env.validation';
+import { RequestContextService } from './common/request-context.service';
 
 @Module({
   imports: [
@@ -35,5 +36,7 @@ import { envValidationSchema } from './config/env.validation';
     AuthModule,
     HealthModule,
   ],
+  providers: [RequestContextService],
+  exports: [RequestContextService],
 })
 export class AppModule {}

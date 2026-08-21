@@ -5,6 +5,8 @@ import express from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { RequestIdMiddleware } from './common/middlewares/request-id.middleware';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -18,10 +20,14 @@ async function bootstrap(): Promise<void> {
     app.enableCors({ origin: corsOrigin });
   }
 
+  const requestIdMiddleware = new RequestIdMiddleware();
+  app.use((req, res, next) => requestIdMiddleware.use(req, res, next));
+
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
   const port = configService.get<number>('PORT') ?? 3003;
   await app.listen(port);

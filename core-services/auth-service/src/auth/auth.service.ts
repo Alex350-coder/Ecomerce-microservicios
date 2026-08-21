@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -50,6 +51,8 @@ const SAFE_USER_FIELDS: (keyof User)[] = [
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
@@ -122,6 +125,13 @@ export class AuthService {
     const { email, password } = loginDto;
 
     if (await this.isAccountLocked(email)) {
+      this.logger.warn(
+        JSON.stringify({
+          event: 'LOGIN_BLOCKED_LOCKED_ACCOUNT',
+          email,
+          timestamp: new Date().toISOString(),
+        }),
+      );
       throw new UnauthorizedException('Cuenta temporalmente bloqueada. Intenta más tarde.');
     }
 
@@ -132,6 +142,13 @@ export class AuthService {
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       await this.incrementLoginAttempts(email);
+      this.logger.warn(
+        JSON.stringify({
+          event: 'LOGIN_FAILED',
+          email,
+          timestamp: new Date().toISOString(),
+        }),
+      );
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
@@ -176,6 +193,16 @@ export class AuthService {
 
     if (record.revokedAt || isExpired) {
       await this.refreshTokensRepository.update({ familyId: record.familyId }, { revokedAt: now });
+      this.logger.error(
+        JSON.stringify({
+          event: 'REFRESH_REUSE_DETECTED',
+          userId: record.userId,
+          familyId: record.familyId,
+          revoked: !!record.revokedAt,
+          expired: isExpired,
+          timestamp: new Date().toISOString(),
+        }),
+      );
       throw new UnauthorizedException('Sesión no válida');
     }
 
@@ -342,6 +369,15 @@ export class AuthService {
       const lockTime = new Date();
       lockTime.setMinutes(lockTime.getMinutes() + 15);
       user.lockedUntil = lockTime;
+      this.logger.warn(
+        JSON.stringify({
+          event: 'LOCKOUT_ACTIVATED',
+          userId: user.id,
+          attempts: user.loginAttempts,
+          lockedUntil: lockTime.toISOString(),
+          timestamp: new Date().toISOString(),
+        }),
+      );
     }
 
     await this.usersRepository.save(user);

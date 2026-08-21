@@ -7,6 +7,8 @@ import { CartItem } from './entities/cart-item.entity';
 import { AddCartItemDto } from './dto/add-cart-item.dto';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import { MergeCartDto } from './dto/merge-cart.dto';
+import { RequestContextService } from '../common/request-context.service';
+import { fetchWithTimeout } from '../common/fetch-with-timeout';
 
 @Injectable()
 export class CartService {
@@ -20,6 +22,7 @@ export class CartService {
     private readonly cartItemRepo: Repository<CartItem>,
     private readonly dataSource: DataSource,
     configService: ConfigService,
+    private readonly requestContext: RequestContextService,
   ) {
     this.inventoryUrl =
       configService.get<string>('INVENTORY_SERVICE_URL') ?? 'http://localhost:3006';
@@ -164,7 +167,10 @@ export class CartService {
 
   private async checkStock(productId: string, quantity: number): Promise<boolean> {
     try {
-      const response = await fetch(`${this.inventoryUrl}/inventory/${productId}`);
+      const requestId = this.requestContext.getRequestId();
+      const response = await fetchWithTimeout(`${this.inventoryUrl}/inventory/${productId}`, {
+        headers: { 'x-request-id': requestId },
+      });
       if (!response.ok) return true;
       const data = (await response.json()) as { available: number };
       return data.available >= quantity;
@@ -178,7 +184,10 @@ export class CartService {
 
   private async getMaxAvailable(productId: string, currentQty: number): Promise<number> {
     try {
-      const response = await fetch(`${this.inventoryUrl}/inventory/${productId}`);
+      const requestId = this.requestContext.getRequestId();
+      const response = await fetchWithTimeout(`${this.inventoryUrl}/inventory/${productId}`, {
+        headers: { 'x-request-id': requestId },
+      });
       if (!response.ok) return currentQty;
       const data = (await response.json()) as { available: number };
       return Math.min(currentQty, data.available);

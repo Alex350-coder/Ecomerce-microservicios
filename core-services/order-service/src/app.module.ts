@@ -5,6 +5,7 @@ import { envValidationSchema } from './config/env.validation';
 import { HealthModule } from './health/health.module';
 import { AuthModule } from './auth/auth.module';
 import { OrdersModule } from './orders/orders.module';
+import { RequestContextService } from './common/request-context.service';
 
 @Module({
   imports: [
@@ -34,5 +35,7 @@ import { OrdersModule } from './orders/orders.module';
     AuthModule,
     OrdersModule,
   ],
+  providers: [RequestContextService],
+  exports: [RequestContextService],
 })
 export class AppModule {}

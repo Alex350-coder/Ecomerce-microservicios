@@ -47,11 +47,4 @@ describe('RequestIdMiddleware', () => {
     expect(res.setHeader).toHaveBeenCalledWith('x-request-id', id);
   });
 
-  it('registers a finish listener on the response', () => {
-    const { req, res, next } = mockReqRes();
-
-    middleware.use(req, res, next);
-
-    expect(res.on).toHaveBeenCalledWith('finish', expect.any(Function));
-  });
 });
