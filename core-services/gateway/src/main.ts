@@ -4,6 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { JwtEdgeMiddleware } from './common/middlewares/jwt-edge.middleware';
 import { RequestIdMiddleware } from './common/middlewares/request-id.middleware';
 
@@ -46,6 +47,7 @@ async function bootstrap(): Promise<void> {
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
   const port = configService.get<number>('PORT') ?? 8000;
   await app.listen(port);
