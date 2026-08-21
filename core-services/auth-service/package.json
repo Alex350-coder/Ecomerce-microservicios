@@ -22,7 +22,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:security": "jest --config ./test/jest-security.json"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -37,6 +38,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "cookie-parser": "^1.4.7",
+    "helmet": "^8.3.0",
     "joi": "^18.2.3",
     "mysql2": "^3.15.3",
     "passport": "^0.7.0",
