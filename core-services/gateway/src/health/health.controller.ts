@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
 import { HealthService } from './health.service';
 
 @Controller('health')
@@ -7,14 +7,28 @@ export class HealthController {
 
   @Get()
   async check() {
-    return this.healthService.report();
+    const report = await this.healthService.report();
+    const hasDown = report.upstreams.some((u) => u.status === 'down');
+
+    if (hasDown) {
+      throw new ServiceUnavailableException({
+        status: 'error',
+        service: 'gateway',
+        timestamp: new Date().toISOString(),
+        upstreams: report.upstreams,
+      });
+    }
+
+    return report;
   }
 
   @Get('ready')
   async ready() {
     const report = await this.healthService.report();
-    return {
-      status: 'ok',
+    const hasDown = report.upstreams.some((u) => u.status === 'down');
+
+    const body = {
+      status: hasDown ? 'error' : 'ok',
       service: 'gateway',
       dependencies: {
         upstreams: report.upstreams.map((u) => ({
@@ -24,5 +38,11 @@ export class HealthController {
       },
       timestamp: new Date().toISOString(),
     };
+
+    if (hasDown) {
+      throw new ServiceUnavailableException(body);
+    }
+
+    return body;
   }
 }

@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { ServiceUnavailableException } from '@nestjs/common';
 import { HealthController } from './health.controller';
 import { HealthService } from './health.service';
 
@@ -19,14 +20,11 @@ describe('HealthController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should report ok on liveness', async () => {
-    const result = await controller.check();
-    expect(result.status).toBe('ok');
-    expect(result.service).toBe('gateway');
+  it('should throw 503 when upstreams are down (liveness)', async () => {
+    await expect(controller.check()).rejects.toThrow(ServiceUnavailableException);
   });
 
-  it('should report ok on readiness', async () => {
-    const result = await controller.ready();
-    expect(result.status).toBe('ok');
+  it('should throw 503 when upstreams are down (readiness)', async () => {
+    await expect(controller.ready()).rejects.toThrow(ServiceUnavailableException);
   });
 });
