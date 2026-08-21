@@ -1,14 +1,15 @@
+import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   IsArray,
   IsInt,
   IsNotEmpty,
   IsOptional,
-  IsString,
   IsUUID,
+  Max,
   Min,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
 class CommitReleaseItemDto {
   @IsUUID()
@@ -17,27 +18,30 @@ class CommitReleaseItemDto {
 
   @IsInt()
   @Min(1)
+  @Max(100)
   quantity!: number;
 }
 
 export class CommitStockDto {
   @IsArray()
+  @ArrayMaxSize(50)
   @ValidateNested({ each: true })
   @Type(() => CommitReleaseItemDto)
   items!: CommitReleaseItemDto[];
 
   @IsOptional()
-  @IsString()
+  @IsUUID()
   reservationId?: string;
 }
 
 export class ReleaseStockDto {
   @IsArray()
+  @ArrayMaxSize(50)
   @ValidateNested({ each: true })
   @Type(() => CommitReleaseItemDto)
   items!: CommitReleaseItemDto[];
 
   @IsOptional()
-  @IsString()
+  @IsUUID()
   reservationId?: string;
 }

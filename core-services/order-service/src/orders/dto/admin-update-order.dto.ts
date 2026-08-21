@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
 import { OrderStatus } from '../enums/order-status.enum';
 
 export class AdminUpdateOrderDto {
@@ -7,5 +7,6 @@ export class AdminUpdateOrderDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(500)
   reason?: string;
 }

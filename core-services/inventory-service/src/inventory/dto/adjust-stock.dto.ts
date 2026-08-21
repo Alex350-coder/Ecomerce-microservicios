@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsOptional, IsUUID, Max, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator';
 
 export class AdjustStockDto {
   @IsUUID()
@@ -11,5 +11,7 @@ export class AdjustStockDto {
   quantity!: number;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(500)
   reason?: string;
 }

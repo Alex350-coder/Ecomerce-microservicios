@@ -3,6 +3,7 @@ import { IsString, MaxLength, MinLength } from 'class-validator';
 export class ResetPasswordDto {
   @IsString()
   @MinLength(1, { message: 'El token es requerido' })
+  @MaxLength(512)
   token!: string;
 
   @IsString()

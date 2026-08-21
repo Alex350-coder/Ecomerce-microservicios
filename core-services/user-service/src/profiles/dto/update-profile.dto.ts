@@ -4,6 +4,7 @@ import { IsBoolean, IsDate, IsEmail, IsOptional, IsString, MaxLength } from 'cla
 export class UpdateProfileDto {
   @IsOptional()
   @IsEmail()
+  @MaxLength(254)
   email?: string;
 
   @IsOptional()

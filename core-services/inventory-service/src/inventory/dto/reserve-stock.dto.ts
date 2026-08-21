@@ -1,10 +1,10 @@
 import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
   IsArray,
   IsInt,
   IsNotEmpty,
   IsOptional,
-  IsString,
   IsUUID,
   Max,
   Min,
@@ -24,11 +24,12 @@ export class ReserveItemDto {
 
 export class ReserveStockDto {
   @IsArray()
+  @ArrayMaxSize(50)
   @ValidateNested({ each: true })
   @Type(() => ReserveItemDto)
   items!: ReserveItemDto[];
 
   @IsOptional()
-  @IsString()
+  @IsUUID()
   reservationId?: string;
 }
