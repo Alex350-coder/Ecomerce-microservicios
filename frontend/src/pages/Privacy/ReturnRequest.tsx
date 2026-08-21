@@ -1,12 +1,21 @@
-import React, { useState } from 'react';
+import { useState, type FormEvent, type ChangeEvent } from 'react';
 import { MainLayout } from '../../templates/MainLayout';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
 import '../../styles/pages/Privacy/ReturnRequest.css';
 
+interface ReturnForm {
+  orderNumber: string;
+  productName: string;
+  reason: string;
+  description: string;
+  contactEmail: string;
+  contactPhone: string;
+}
+
 export const ReturnRequest = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ReturnForm>({
     orderNumber: '',
     productName: '',
     reason: '',
@@ -15,17 +24,17 @@ export const ReturnRequest = () => {
     contactPhone: '',
   });
 
-  const [receiptFile, setReceiptFile] = useState(null);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
 
-  const handleChange = (field, value) => {
+  const handleChange = <K extends keyof ReturnForm>(field: K, value: ReturnForm[K]) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file && file.type === 'application/pdf') {
       setReceiptFile(file);
     } else {
@@ -33,7 +42,7 @@ export const ReturnRequest = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     if (!receiptFile) {
@@ -44,7 +53,6 @@ export const ReturnRequest = () => {
     console.log('Solicitud de devolución:', { ...formData, receiptFile });
     alert('Solicitud de devolución enviada. Te contactaremos en 24-48 horas.');
 
-    // Reset form
     setFormData({
       orderNumber: '',
       productName: '',
@@ -111,7 +119,7 @@ export const ReturnRequest = () => {
                   value={formData.description}
                   onChange={(e) => handleChange('description', e.target.value)}
                   placeholder="Describe el problema o razón de la devolución en detalle..."
-                  rows="4"
+                  rows={4}
                   required
                   className="description-textarea"
                 />

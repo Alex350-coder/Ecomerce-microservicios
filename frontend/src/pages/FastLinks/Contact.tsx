@@ -1,26 +1,33 @@
-import React, { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { MainLayout } from '../../templates/MainLayout';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
 import '../../styles/pages/FastLinks/Contact.css';
 
+interface ContactForm {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
 export const Contact = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ContactForm>({
     name: '',
     email: '',
     subject: '',
     message: '',
   });
 
-  const handleChange = (field, value) => {
+  const handleChange = <K extends keyof ContactForm>(field: K, value: ContactForm[K]) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     console.log('Formulario contacto:', formData);
     alert('¡Mensaje enviado! Te contactaremos pronto.');
@@ -97,7 +104,7 @@ export const Contact = () => {
                   <textarea
                     value={formData.message}
                     onChange={(e) => handleChange('message', e.target.value)}
-                    rows="6"
+                    rows={6}
                     required
                     className="message-textarea"
                   />

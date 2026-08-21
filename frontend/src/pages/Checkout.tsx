@@ -53,7 +53,15 @@ export const Checkout = () => {
   };
 
   const isFormValid = useMemo(() => {
-    const required: (keyof AddressForm)[] = ['fullName', 'email', 'phone', 'address', 'city', 'postalCode', 'country'];
+    const required: (keyof AddressForm)[] = [
+      'fullName',
+      'email',
+      'phone',
+      'address',
+      'city',
+      'postalCode',
+      'country',
+    ];
     return required.every((f) => address[f].trim().length > 0);
   }, [address]);
 
@@ -135,13 +143,56 @@ export const Checkout = () => {
             <Card className="checkout-section">
               <h2>Informacion de Envio</h2>
               <div className="form-grid">
-                <Input label="Nombre Completo" placeholder="Juan Perez" value={address.fullName} onChange={(e) => handleAddressChange('fullName', e.target.value)} required />
-                <Input label="Correo Electronico" type="email" placeholder="juan@email.com" value={address.email} onChange={(e) => handleAddressChange('email', e.target.value)} required />
-                <Input label="Telefono" placeholder="+34 600 000 000" value={address.phone} onChange={(e) => handleAddressChange('phone', e.target.value)} required />
-                <Input label="Direccion" placeholder="Calle Principal 123" value={address.address} onChange={(e) => handleAddressChange('address', e.target.value)} required />
-                <Input label="Ciudad" placeholder="Madrid" value={address.city} onChange={(e) => handleAddressChange('city', e.target.value)} required />
-                <Input label="Codigo Postal" placeholder="28001" value={address.postalCode} onChange={(e) => handleAddressChange('postalCode', e.target.value)} required />
-                <Input label="Pais" placeholder="Espana" value={address.country} onChange={(e) => handleAddressChange('country', e.target.value)} required />
+                <Input
+                  label="Nombre Completo"
+                  placeholder="Juan Perez"
+                  value={address.fullName}
+                  onChange={(e) => handleAddressChange('fullName', e.target.value)}
+                  required
+                />
+                <Input
+                  label="Correo Electronico"
+                  type="email"
+                  placeholder="juan@email.com"
+                  value={address.email}
+                  onChange={(e) => handleAddressChange('email', e.target.value)}
+                  required
+                />
+                <Input
+                  label="Telefono"
+                  placeholder="+34 600 000 000"
+                  value={address.phone}
+                  onChange={(e) => handleAddressChange('phone', e.target.value)}
+                  required
+                />
+                <Input
+                  label="Direccion"
+                  placeholder="Calle Principal 123"
+                  value={address.address}
+                  onChange={(e) => handleAddressChange('address', e.target.value)}
+                  required
+                />
+                <Input
+                  label="Ciudad"
+                  placeholder="Madrid"
+                  value={address.city}
+                  onChange={(e) => handleAddressChange('city', e.target.value)}
+                  required
+                />
+                <Input
+                  label="Codigo Postal"
+                  placeholder="28001"
+                  value={address.postalCode}
+                  onChange={(e) => handleAddressChange('postalCode', e.target.value)}
+                  required
+                />
+                <Input
+                  label="Pais"
+                  placeholder="Espana"
+                  value={address.country}
+                  onChange={(e) => handleAddressChange('country', e.target.value)}
+                  required
+                />
               </div>
             </Card>
 
@@ -159,7 +210,9 @@ export const Checkout = () => {
                     />
                     <div className="method-info">
                       <span className="method-name">{method.name}</span>
-                      <span className="method-details">{method.days} - ${method.price.toFixed(2)}</span>
+                      <span className="method-details">
+                        {method.days} - ${method.price.toFixed(2)}
+                      </span>
                     </div>
                   </label>
                 ))}

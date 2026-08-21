@@ -1,5 +1,5 @@
 .main-layout {
-  height: 100vh; 
+  height: 100vh;
   display: flex;
   flex-direction: column;
 }
@@ -11,6 +11,6 @@
 
 @media (max-width: 768px) {
   .main-content {
-    margin-top: 1400px; 
+    margin-top: 1400px;
   }
 }

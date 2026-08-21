@@ -1,4 +1,3 @@
-import React from 'react';
 import { MainLayout } from '../../templates/MainLayout';
 import { Card } from '../../components/ui/Card';
 import '../../styles/pages/FastLinks/About.css';

@@ -1,11 +1,15 @@
-import React from 'react';
 import { Button } from './Button';
 import { Card } from './Card';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import '../../styles/ui/CartDropdown.css';
 
-export const CartDropdown = ({ isOpen, onClose }) => {
+interface CartDropdownProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const CartDropdown = ({ isOpen, onClose }: CartDropdownProps) => {
   const { items, totalItems, totalPrice } = useCart();
 
   if (!isOpen) return null;

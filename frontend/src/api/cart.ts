@@ -43,10 +43,7 @@ export async function addToCart(item: AddCartItemInput): Promise<CartDto> {
   });
 }
 
-export async function updateCartItem(
-  itemId: string,
-  quantity: number,
-): Promise<CartDto> {
+export async function updateCartItem(itemId: string, quantity: number): Promise<CartDto> {
   return apiClient<CartDto>(`/cart/items/${itemId}`, {
     method: 'PATCH',
     body: JSON.stringify({ quantity }),
@@ -63,9 +60,7 @@ export async function clearCartApi(): Promise<void> {
   await apiClient<void>('/cart', { method: 'DELETE' });
 }
 
-export async function mergeGuestCart(
-  items: MergeCartItemInput[],
-): Promise<CartDto> {
+export async function mergeGuestCart(items: MergeCartItemInput[]): Promise<CartDto> {
   return apiClient<CartDto>('/cart/merge', {
     method: 'POST',
     body: JSON.stringify({ items }),

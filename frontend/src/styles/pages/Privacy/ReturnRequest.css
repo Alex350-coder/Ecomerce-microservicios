@@ -235,19 +235,19 @@
   .return-request-page {
     padding: 1rem;
   }
-  
+
   .return-form-card {
     padding: 1.5rem;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .return-request-header h1 {
     font-size: 2rem;
   }
-  
+
   .form-section h3 {
     font-size: 1.2rem;
   }
@@ -257,15 +257,15 @@
   .return-request-page {
     padding: 0.5rem;
   }
-  
+
   .return-form-card {
     padding: 1rem;
   }
-  
+
   .file-display {
     padding: 1rem;
   }
-  
+
   .submit-button {
     height: 2.75rem;
     font-size: 1rem;
@@ -307,6 +307,10 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

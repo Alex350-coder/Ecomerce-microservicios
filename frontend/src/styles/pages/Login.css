@@ -23,11 +23,7 @@
 .logo-icon {
   width: 3rem;
   height: 3rem;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--accent-color)
-  );
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
   border-radius: 10px;
   display: flex;
   align-items: center;

@@ -3,7 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { MainLayout } from '../templates/MainLayout';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Spinner } from '../components/ui/Spinner';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton';
 import { useAuth } from '../context/AuthContext';
 import { fetchMyOrders, cancelOrder, type OrderDto } from '../api/orders';
 import '../styles/pages/Orders.css';
@@ -82,12 +83,15 @@ export const Orders = () => {
     return (
       <MainLayout>
         <div className="orders-page">
-          <Card className="empty-state">
-            <p>Inicia sesion para ver tus pedidos.</p>
-            <Link to="/login">
-              <Button variant="primary">Iniciar sesion</Button>
-            </Link>
-          </Card>
+          <EmptyState
+            icon="🔒"
+            title="Inicia sesión para ver tus pedidos"
+            action={
+              <Link to="/login">
+                <Button variant="primary">Iniciar sesión</Button>
+              </Link>
+            }
+          />
         </div>
       </MainLayout>
     );
@@ -96,8 +100,29 @@ export const Orders = () => {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="orders-page orders-loading">
-          <Spinner />
+        <div className="orders-page">
+          <h1>Mis Pedidos</h1>
+          <div className="orders-list">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Card key={i} className="order-card">
+                <div className="order-header">
+                  <div className="order-meta">
+                    <Skeleton variant="text" width="120px" />
+                    <Skeleton variant="text" width="80px" />
+                  </div>
+                  <Skeleton variant="button" width="90px" />
+                </div>
+                <div className="order-items">
+                  <Skeleton variant="text" width="70%" />
+                  <Skeleton variant="text" width="50%" />
+                </div>
+                <div className="order-footer">
+                  <Skeleton variant="text" width="100px" />
+                  <Skeleton variant="button" width="140px" />
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
       </MainLayout>
     );
@@ -121,12 +146,16 @@ export const Orders = () => {
         )}
 
         {orders.length === 0 ? (
-          <Card className="empty-state">
-            <p>Aun no tienes pedidos.</p>
-            <Link to="/products">
-              <Button variant="primary">Explorar productos</Button>
-            </Link>
-          </Card>
+          <EmptyState
+            icon="📋"
+            title="Aún no tienes pedidos"
+            description="Tus pedidos aparecerán aquí cuando realices una compra."
+            action={
+              <Link to="/products">
+                <Button variant="primary">Explorar productos</Button>
+              </Link>
+            }
+          />
         ) : (
           <div className="orders-list">
             {orders.map((order) => (
@@ -134,7 +163,9 @@ export const Orders = () => {
                 <div className="order-header">
                   <div className="order-meta">
                     <span className="order-id">Pedido #{order.id.slice(0, 8)}</span>
-                    <span className="order-date">{new Date(order.createdAt).toLocaleDateString('es-ES')}</span>
+                    <span className="order-date">
+                      {new Date(order.createdAt).toLocaleDateString('es-ES')}
+                    </span>
                   </div>
                   <span className={`order-status ${STATUS_COLORS[order.status]}`}>
                     {STATUS_LABELS[order.status]}
@@ -157,10 +188,16 @@ export const Orders = () => {
                   </span>
                   <div className="order-actions">
                     <Link to={`/orders/${order.id}`}>
-                      <Button variant="secondary" size="sm">Ver detalle</Button>
+                      <Button variant="secondary" size="sm">
+                        Ver detalle
+                      </Button>
                     </Link>
                     {order.status === 'pending' && (
-                      <Button variant="outline" size="sm" onClick={() => void handleCancelOrder(order.id)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => void handleCancelOrder(order.id)}
+                      >
                         Cancelar
                       </Button>
                     )}

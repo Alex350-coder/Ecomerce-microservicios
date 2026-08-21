@@ -17,6 +17,15 @@ import { Privacy } from './pages/Privacy';
 import { Returns } from './pages/Privacy';
 import { ReturnRequest } from './pages/Privacy';
 import { Terms } from './pages/Privacy';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { AdminLayout } from './components/layout/AdminLayout';
+import {
+  AdminDashboard,
+  AdminProducts,
+  ProductForm,
+  AdminOrders,
+  AdminInventory,
+} from './pages/admin';
 
 import './styles/globals.css';
 import './styles/variables.css';
@@ -43,6 +52,24 @@ function App() {
         <Route path="/returns" element={<Returns />} />
         <Route path="/return-request" element={<ReturnRequest />} />
         <Route path="/terms" element={<Terms />} />
+
+        {/* Admin routes */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="products/new" element={<ProductForm />} />
+          <Route path="products/:id/edit" element={<ProductForm />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="inventory" element={<AdminInventory />} />
+        </Route>
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

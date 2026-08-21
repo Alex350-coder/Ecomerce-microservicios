@@ -5,7 +5,8 @@ import { MainLayout } from '../templates/MainLayout';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card } from '../components/ui/Card';
-import { Spinner } from '../components/ui/Spinner';
+import { SkeletonCard } from '../components/ui/Skeleton';
+import { EmptyState } from '../components/ui/EmptyState';
 import { useCart } from '../context/CartContext';
 import {
   fetchProducts,
@@ -118,32 +119,44 @@ export const Products = () => {
           </div>
         )}
 
-        {isLoading && <Spinner label="Cargando productos..." />}
-
-        {isError && (
-          <div className="no-products">
-            <h3>No se pudieron cargar los productos</h3>
-            <p>Verifica tu conexión e inténtalo de nuevo.</p>
-            <Button variant="outline" onClick={() => refetch()}>
-              Reintentar
-            </Button>
+        {isLoading && (
+          <div className="products-grid">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
         )}
 
+        {isError && (
+          <EmptyState
+            icon="⚠️"
+            title="No se pudieron cargar los productos"
+            description="Verifica tu conexión e inténtalo de nuevo."
+            action={
+              <Button variant="outline" onClick={() => refetch()}>
+                Reintentar
+              </Button>
+            }
+          />
+        )}
+
         {!isLoading && !isError && data && data.data.length === 0 && (
-          <div className="no-products">
-            <h3>No se encontraron productos</h3>
-            <p>Intenta con otros filtros o términos de búsqueda.</p>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSearchTerm('');
-                setCategoryId('');
-              }}
-            >
-              Limpiar Filtros
-            </Button>
-          </div>
+          <EmptyState
+            icon="🔍"
+            title="No se encontraron productos"
+            description="Intenta con otros filtros o términos de búsqueda."
+            action={
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchTerm('');
+                  setCategoryId('');
+                }}
+              >
+                Limpiar Filtros
+              </Button>
+            }
+          />
         )}
 
         {!isLoading && !isError && data && data.data.length > 0 && (
