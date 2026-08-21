@@ -84,6 +84,21 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "main\\.ts$",
+      "data-source\\.ts$",
+      "migrations/",
+      "seed/"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 70,
+        "branches": 65,
+        "functions": 70,
+        "lines": 70
+      }
+    },
     "testEnvironment": "node"
   }
 }

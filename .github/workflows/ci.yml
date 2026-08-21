@@ -7,7 +7,7 @@ on:
 
 jobs:
   quality:
-    name: quality (${{ matrix.package.dir }})
+    name: quality (${{ matrix.dir }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -27,13 +27,11 @@ jobs:
             strict: true
           - dir: core-services/gateway
             strict: true
-          # auth-service: deuda preexistente de lint y tests (no-bloqueantes).
-          # typecheck y build SI bloquean.
           - dir: core-services/auth-service
-            strict: false
+            strict: true
           - dir: frontend
             strict: true
-            has-test: false
+            is-frontend: true
     steps:
       - uses: actions/checkout@v4
 
@@ -41,33 +39,45 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: ${{ matrix.package.dir }}/package-lock.json
+          cache-dependency-path: ${{ matrix.dir }}/package-lock.json
 
       - name: Alinear npm con los lockfiles (generados con npm 11)
         run: npm install -g npm@11.2.0
 
       - name: Instalar dependencias
-        working-directory: ${{ matrix.package.dir }}
+        working-directory: ${{ matrix.dir }}
         run: npm ci --no-audit --no-fund
 
       - name: Lint
-        working-directory: ${{ matrix.package.dir }}
+        working-directory: ${{ matrix.dir }}
         run: npm run lint
-        continue-on-error: ${{ !matrix.package.strict }}
+        continue-on-error: ${{ !matrix.strict }}
 
       - name: Typecheck
-        working-directory: ${{ matrix.package.dir }}
+        working-directory: ${{ matrix.dir }}
         run: npm run typecheck --if-present
 
       - name: Build
-        working-directory: ${{ matrix.package.dir }}
+        working-directory: ${{ matrix.dir }}
         run: npm run build
 
-      - name: Test
-        working-directory: ${{ matrix.package.dir }}
-        run: npm test -- --runInBand
-        if: ${{ matrix.package.has-test != false }}
-        continue-on-error: ${{ !matrix.package.strict }}
+      - name: Test with coverage (backend)
+        if: ${{ !matrix.is-frontend }}
+        working-directory: ${{ matrix.dir }}
+        run: npm run test:cov -- --runInBand
+
+      - name: Test with coverage (frontend)
+        if: ${{ matrix.is-frontend }}
+        working-directory: ${{ matrix.dir }}
+        run: npm run test:coverage
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.dir }}
+          path: ${{ matrix.dir }}/coverage/
+          retention-days: 7
 
   audit:
     name: audit (${{ matrix.dir }})
@@ -145,3 +155,115 @@ jobs:
 
       - name: Smoke test /health (gateway y frontend por host, servicios por exec)
         run: bash scripts/smoke-ci.sh
+
+  security-tests:
+    name: security-tests (auth-service)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: core-services/auth-service/package-lock.json
+      - name: Alinear npm con los lockfiles (generados con npm 11)
+        run: npm install -g npm@11.2.0
+      - name: Instalar dependencias
+        working-directory: core-services/auth-service
+        run: npm ci --no-audit --no-fund
+      - name: Security suite (DTO validation, guards, error handling, validation pipe)
+        working-directory: core-services/auth-service
+        run: npm run test:security
+
+  trivy:
+    name: trivy (fs scan)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Trivy filesystem scan (CRITICAL = fail)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH
+          exit-code: 1
+          ignore-unfixed: true
+          skip-dirs: node_modules,coverage,.git
+
+  e2e:
+    name: e2e (playwright critical flow)
+    runs-on: ubuntu-latest
+    needs: [smoke]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generar .env para e2e
+        run: |
+          cat > .env <<'EOF'
+          MYSQL_ROOT_PASSWORD=ci_e2e_root_only
+          AUTH_DB_PASSWORD=ci_e2e_auth_only
+          USER_DB_PASSWORD=ci_e2e_user_only
+          PRODUCT_DB_PASSWORD=ci_e2e_product_only
+          CART_DB_PASSWORD=ci_e2e_cart_only
+          ORDER_DB_PASSWORD=ci_e2e_order_only
+          INVENTORY_DB_PASSWORD=ci_e2e_inventory_only
+          PAYMENT_DB_PASSWORD=ci_e2e_payment_only
+          JWT_SECRET=ci_e2e_jwt_secret_only
+          EOF
+
+      - name: Levantar el stack completo
+        run: docker compose up -d --build
+
+      - name: Esperar a que los servicios estén healthy
+        run: |
+          for i in $(seq 1 60); do
+            COUNT=$(docker compose ps --status running | grep -c healthy || true)
+            if [ "$COUNT" -ge 9 ]; then
+              echo "healthy: $COUNT/9"
+              break
+            fi
+            sleep 5
+          done
+
+      - name: Seed productos de prueba
+        run: |
+          docker compose exec -T product-service npm run seed || echo "Seed failed (non-critical)"
+
+      - name: Setup Node para Playwright
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependencias e2e
+        working-directory: e2e
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: e2e
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        working-directory: e2e
+        run: npx playwright test
+        env:
+          BASE_URL: http://localhost:5173
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e/playwright-report/
+          retention-days: 7
+
+      - name: Upload Playwright traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: e2e/test-results/
+          retention-days: 7
+
+      - name: Tear down stack
+        if: always()
+        run: docker compose down -v
