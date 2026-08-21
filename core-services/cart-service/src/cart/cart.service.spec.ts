@@ -6,6 +6,7 @@ import { DataSource } from 'typeorm';
 import { CartService } from './cart.service';
 import { Cart } from './entities/cart.entity';
 import { CartItem } from './entities/cart-item.entity';
+import { RequestContextService } from '../common/request-context.service';
 
 const mockCartRepo = () => ({
   findOne: jest.fn(),
@@ -72,6 +73,7 @@ describe('CartService', () => {
         { provide: getRepositoryToken(CartItem), useValue: cartItemRepo },
         { provide: DataSource, useValue: mockDataSource },
         { provide: ConfigService, useValue: configService },
+        RequestContextService,
       ],
     }).compile();
 

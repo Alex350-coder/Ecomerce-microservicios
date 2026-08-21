@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { RequestContextService } from './common/request-context.service';
 import { RequestIdMiddleware } from './common/middlewares/request-id.middleware';
 
 async function bootstrap(): Promise<void> {
@@ -27,7 +28,9 @@ async function bootstrap(): Promise<void> {
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalInterceptors(new LoggingInterceptor());
+
+  const requestContext = app.get(RequestContextService);
+  app.useGlobalInterceptors(new LoggingInterceptor(requestContext));
 
   const port = configService.get<number>('PORT') ?? 3005;
   await app.listen(port);

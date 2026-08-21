@@ -18,6 +18,7 @@ import { CancelOrderDto } from './dto/cancel-order.dto';
 import { AdminUpdateOrderDto } from './dto/admin-update-order.dto';
 import { calculateOrderTotals } from './helpers/price-calculator';
 import { isValidTransition, canCancel } from './helpers/status-machine';
+import { RequestContextService } from '../common/request-context.service';
 
 interface InventoryResponse {
   reservationId: string;
@@ -44,6 +45,7 @@ export class OrdersService {
     private readonly idempotencyRepo: Repository<Idempotency>,
     private readonly dataSource: DataSource,
     configService: ConfigService,
+    private readonly requestContext: RequestContextService,
   ) {
     this.inventoryUrl =
       configService.get<string>('INVENTORY_SERVICE_URL') ?? 'http://localhost:3006';
@@ -173,9 +175,13 @@ export class OrdersService {
     items: CreateOrderDto['items'],
     reservationId: string,
   ): Promise<InventoryResponse> {
+    const requestId = this.requestContext.getRequestId();
     const response = await fetch(`${this.inventoryUrl}/inventory/reserve`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-request-id': requestId,
+      },
       body: JSON.stringify({
         items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
         reservationId,
@@ -193,9 +199,13 @@ export class OrdersService {
     items: CreateOrderDto['items'],
     reservationId: string,
   ): Promise<void> {
+    const requestId = this.requestContext.getRequestId();
     const response = await fetch(`${this.inventoryUrl}/inventory/commit`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-request-id': requestId,
+      },
       body: JSON.stringify({
         items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
         reservationId,
@@ -211,9 +221,13 @@ export class OrdersService {
     items: CreateOrderDto['items'],
     reservationId: string,
   ): Promise<void> {
+    const requestId = this.requestContext.getRequestId();
     const response = await fetch(`${this.inventoryUrl}/inventory/release`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-request-id': requestId,
+      },
       body: JSON.stringify({
         items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
         reservationId,
@@ -230,12 +244,14 @@ export class OrdersService {
     items: CreateOrderDto['items'],
   ): Promise<PaymentResponse> {
     const idempotencyKey = `order-${order.id}`;
+    const requestId = this.requestContext.getRequestId();
 
     const response = await fetch(`${this.paymentUrl}/payments/intents`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'idempotency-key': idempotencyKey,
+        'x-request-id': requestId,
       },
       body: JSON.stringify({
         orderId: order.id,

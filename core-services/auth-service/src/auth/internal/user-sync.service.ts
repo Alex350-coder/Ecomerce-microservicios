@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { RequestContextService } from '../../common/request-context.service';
 
 export interface NewUserPayload {
   id: string;
@@ -12,7 +13,10 @@ export interface NewUserPayload {
 export class UserSyncService {
   private readonly logger = new Logger(UserSyncService.name);
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly requestContext: RequestContextService,
+  ) {}
 
   async notifyUserCreated(user: NewUserPayload): Promise<void> {
     const url = this.configService.get<string>('USER_SERVICE_URL');
@@ -22,9 +26,13 @@ export class UserSyncService {
     }
 
     try {
+      const requestId = this.requestContext.getRequestId();
       const response = await fetch(`${url}/internal/users`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-request-id': requestId,
+        },
         body: JSON.stringify(user),
       });
 

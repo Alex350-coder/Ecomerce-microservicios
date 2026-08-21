@@ -1,9 +1,11 @@
 import { ConfigService } from '@nestjs/config';
 import { UserSyncService } from './user-sync.service';
+import { RequestContextService } from '../../common/request-context.service';
 
 describe('UserSyncService', () => {
   let service: UserSyncService;
   let configService: ConfigService;
+  let requestContext: RequestContextService;
   const payload = {
     id: 'user-1',
     email: 'ana@example.com',
@@ -17,7 +19,8 @@ describe('UserSyncService', () => {
         key === 'USER_SERVICE_URL' ? 'http://localhost:3001' : undefined,
       ),
     } as unknown as ConfigService;
-    service = new UserSyncService(configService);
+    requestContext = new RequestContextService();
+    service = new UserSyncService(configService, requestContext);
   });
 
   afterEach(() => {
@@ -44,7 +47,9 @@ describe('UserSyncService', () => {
       'http://localhost:3001/internal/users',
       expect.objectContaining({
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json',
+        }) as Record<string, string>,
         body: JSON.stringify(payload),
       }),
     );
