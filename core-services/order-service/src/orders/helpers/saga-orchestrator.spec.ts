@@ -31,7 +31,9 @@ describe('SagaOrchestrator', () => {
     });
 
     it('should reject DELIVERED to PENDING', () => {
-      expect(orchestrator.validateTransition(OrderStatus.DELIVERED, OrderStatus.PENDING)).toBe(false);
+      expect(orchestrator.validateTransition(OrderStatus.DELIVERED, OrderStatus.PENDING)).toBe(
+        false,
+      );
     });
   });
 

@@ -1,14 +1,7 @@
-import { randomUUID } from 'crypto';
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  Logger,
-  NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -25,7 +18,8 @@ export class LoggingInterceptor implements NestInterceptor {
       tap({
         next: () => {
           const durationMs = Date.now() - startedAt;
-          const statusCode = context.switchToHttp().getResponse().statusCode;
+          const res = context.switchToHttp().getResponse<Response>();
+          const statusCode = res.statusCode;
           this.logger.log(
             JSON.stringify({
               timestamp: new Date().toISOString(),
@@ -55,8 +49,7 @@ export class LoggingInterceptor implements NestInterceptor {
               url,
               statusCode,
               durationMs,
-              error:
-                err instanceof Error ? err.message : 'Unknown error',
+              error: err instanceof Error ? err.message : 'Unknown error',
             }),
           );
         },

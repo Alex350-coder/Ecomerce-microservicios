@@ -38,13 +38,17 @@ describe('HttpExceptionFilter', () => {
     const json = jest.fn();
     const status = jest.fn().mockReturnValue({ json });
     filter.catch(new Error('boom'), mockHost(json, status));
-    expect(json.mock.calls[0][0].requestId).toBeDefined();
+    const body = (json.mock.calls as unknown[][])[0][0] as Record<string, unknown>;
+    expect(body.requestId).toBeDefined();
   });
 
   it('maps validation arrays', () => {
     const json = jest.fn();
     const status = jest.fn().mockReturnValue({ json });
-    filter.catch(new HttpException({ message: ['a', 'b'] }, HttpStatus.BAD_REQUEST), mockHost(json, status));
+    filter.catch(
+      new HttpException({ message: ['a', 'b'] }, HttpStatus.BAD_REQUEST),
+      mockHost(json, status),
+    );
     expect(json).toHaveBeenCalledWith(expect.objectContaining({ message: ['a', 'b'] }));
   });
 });

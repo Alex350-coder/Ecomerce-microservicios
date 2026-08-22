@@ -1,6 +1,11 @@
 import { HttpExceptionFilter } from '../../src/common/filters/http-exception.filter';
 import { ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 
+interface MockResponse {
+  status: jest.Mock;
+  json: jest.Mock;
+}
+
 describe('Security: Error Handling (auth-service)', () => {
   let filter: HttpExceptionFilter;
 
@@ -8,8 +13,8 @@ describe('Security: Error Handling (auth-service)', () => {
     filter = new HttpExceptionFilter();
   });
 
-  function createMockHost(statusCode?: number, body?: unknown) {
-    const res = {
+  function createMockHost() {
+    const res: MockResponse = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
@@ -28,20 +33,29 @@ describe('Security: Error Handling (auth-service)', () => {
     } as unknown as ArgumentsHost;
   }
 
+  function getRes(host: ArgumentsHost): MockResponse {
+    return host.switchToHttp().getResponse();
+  }
+
+  function getBody(host: ArgumentsHost): Record<string, unknown> {
+    const res = getRes(host);
+    return (res.json.mock.calls as unknown[][])[0][0] as Record<string, unknown>;
+  }
+
   it('E5: error response does not contain stack trace', () => {
     const exception = new HttpException('Internal error', HttpStatus.INTERNAL_SERVER_ERROR);
     const host = createMockHost();
 
     filter.catch(exception, host);
 
-    const res = host.switchToHttp().getResponse();
+    const res = getRes(host);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         statusCode: 500,
       }),
     );
 
-    const body = res.json.mock.calls[0][0];
+    const body = getBody(host);
     expect(JSON.stringify(body)).not.toContain('stack');
     expect(JSON.stringify(body)).not.toContain('at ');
   });
@@ -52,8 +66,7 @@ describe('Security: Error Handling (auth-service)', () => {
 
     filter.catch(exception, host);
 
-    const res = host.switchToHttp().getResponse();
-    const body = res.json.mock.calls[0][0];
+    const body = getBody(host);
     expect(body).toHaveProperty('requestId');
   });
 
@@ -63,8 +76,7 @@ describe('Security: Error Handling (auth-service)', () => {
 
     filter.catch(exception, host);
 
-    const res = host.switchToHttp().getResponse();
-    const body = res.json.mock.calls[0][0];
+    const body = getBody(host);
     expect(body.statusCode).toBe(401);
     expect(JSON.stringify(body)).not.toContain('password');
     expect(JSON.stringify(body)).not.toContain('token');
@@ -76,8 +88,7 @@ describe('Security: Error Handling (auth-service)', () => {
 
     filter.catch(exception, host);
 
-    const res = host.switchToHttp().getResponse();
-    const body = res.json.mock.calls[0][0];
+    const body = getBody(host);
     expect(body.statusCode).toBe(403);
   });
 
@@ -90,8 +101,7 @@ describe('Security: Error Handling (auth-service)', () => {
 
     filter.catch(exception, host);
 
-    const res = host.switchToHttp().getResponse();
-    const body = res.json.mock.calls[0][0];
+    const body = getBody(host);
     expect(body.statusCode).toBe(400);
     expect(JSON.stringify(body)).not.toContain('database');
     expect(JSON.stringify(body)).not.toContain('query');

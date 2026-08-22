@@ -17,7 +17,7 @@ describe('Security: DTO Validation (auth-service)', () => {
       });
       const errors = await validate(dto);
       expect(errors.length).toBeGreaterThan(0);
-      expect(errors.some(e => e.property === 'email')).toBe(true);
+      expect(errors.some((e) => e.property === 'email')).toBe(true);
     });
 
     it('C1: rejects extra fields (whitelist)', async () => {
@@ -41,7 +41,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         lastName: 'User',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'password')).toBe(true);
+      expect(errors.some((e) => e.property === 'password')).toBe(true);
     });
 
     it('R1.2: rejects password longer than 72 chars (bcrypt limit)', async () => {
@@ -52,7 +52,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         lastName: 'User',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'password')).toBe(true);
+      expect(errors.some((e) => e.property === 'password')).toBe(true);
     });
 
     it('rejects empty firstName', async () => {
@@ -63,7 +63,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         lastName: 'User',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'firstName')).toBe(true);
+      expect(errors.some((e) => e.property === 'firstName')).toBe(true);
     });
 
     it('rejects firstName over 100 chars', async () => {
@@ -74,7 +74,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         lastName: 'User',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'firstName')).toBe(true);
+      expect(errors.some((e) => e.property === 'firstName')).toBe(true);
     });
   });
 
@@ -85,7 +85,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         password: 'password123',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'email')).toBe(true);
+      expect(errors.some((e) => e.property === 'email')).toBe(true);
     });
 
     it('C6: rejects extremely long email (DoS)', async () => {
@@ -94,7 +94,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         password: 'password123',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'email')).toBe(true);
+      expect(errors.some((e) => e.property === 'email')).toBe(true);
     });
 
     it('rejects short password', async () => {
@@ -103,7 +103,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         password: 'short',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'password')).toBe(true);
+      expect(errors.some((e) => e.property === 'password')).toBe(true);
     });
   });
 
@@ -111,13 +111,13 @@ describe('Security: DTO Validation (auth-service)', () => {
     it('C2: rejects malformed email', async () => {
       const dto = plainToInstance(ForgotPasswordDto, { email: 'bad' });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'email')).toBe(true);
+      expect(errors.some((e) => e.property === 'email')).toBe(true);
     });
 
     it('rejects empty email', async () => {
       const dto = plainToInstance(ForgotPasswordDto, { email: '' });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'email')).toBe(true);
+      expect(errors.some((e) => e.property === 'email')).toBe(true);
     });
   });
 
@@ -128,7 +128,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         newPassword: 'new-password-123',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'token')).toBe(true);
+      expect(errors.some((e) => e.property === 'token')).toBe(true);
     });
 
     it('rejects token over 512 chars (DoS)', async () => {
@@ -137,7 +137,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         newPassword: 'new-password-123',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'token')).toBe(true);
+      expect(errors.some((e) => e.property === 'token')).toBe(true);
     });
 
     it('R1.6: rejects short new password', async () => {
@@ -146,7 +146,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         newPassword: 'short',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'newPassword')).toBe(true);
+      expect(errors.some((e) => e.property === 'newPassword')).toBe(true);
     });
   });
 
@@ -157,7 +157,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         newPassword: 'new-password-123',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'currentPassword')).toBe(true);
+      expect(errors.some((e) => e.property === 'currentPassword')).toBe(true);
     });
 
     it('rejects current password over 72 chars', async () => {
@@ -166,7 +166,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         newPassword: 'new-password-123',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'currentPassword')).toBe(true);
+      expect(errors.some((e) => e.property === 'currentPassword')).toBe(true);
     });
 
     it('rejects short new password', async () => {
@@ -175,7 +175,7 @@ describe('Security: DTO Validation (auth-service)', () => {
         newPassword: 'short',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'newPassword')).toBe(true);
+      expect(errors.some((e) => e.property === 'newPassword')).toBe(true);
     });
   });
 });

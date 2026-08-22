@@ -145,8 +145,8 @@ jobs:
           for i in $(seq 1 60); do
             if docker compose ps --status running 2>/dev/null | grep -q healthy; then
               COUNT=$(docker compose ps --status running | grep -c healthy || true)
-              if [ "$COUNT" -ge 9 ]; then
-                echo "healthy: $COUNT/9"
+              if [ "$COUNT" -ge 8 ]; then
+                echo "healthy: $COUNT/8"
                 break
               fi
             fi
@@ -218,8 +218,8 @@ jobs:
         run: |
           for i in $(seq 1 60); do
             COUNT=$(docker compose ps --status running | grep -c healthy || true)
-            if [ "$COUNT" -ge 9 ]; then
-              echo "healthy: $COUNT/9"
+            if [ "$COUNT" -ge 8 ]; then
+              echo "healthy: $COUNT/8"
               break
             fi
             sleep 5

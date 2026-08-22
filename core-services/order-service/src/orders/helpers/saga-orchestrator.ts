@@ -12,9 +12,7 @@ export interface CompensationActions {
 export class SagaOrchestrator {
   private readonly logger = new Logger(SagaOrchestrator.name);
 
-  determineCompensation(
-    failedStep: 'reserve' | 'payment',
-  ): CompensationActions {
+  determineCompensation(failedStep: 'reserve' | 'payment'): CompensationActions {
     this.logger.warn(`Saga compensation triggered at step: ${failedStep}`);
 
     if (failedStep === 'reserve') {

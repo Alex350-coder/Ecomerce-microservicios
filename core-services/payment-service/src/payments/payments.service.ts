@@ -37,9 +37,7 @@ export class PaymentsService {
     });
 
     if (existingForOrder) {
-      throw new ConflictException(
-        `Ya existe un intent de pago para la orden ${dto.orderId}`,
-      );
+      throw new ConflictException(`Ya existe un intent de pago para la orden ${dto.orderId}`);
     }
 
     const intent = this.paymentRepo.create({
@@ -79,9 +77,7 @@ export class PaymentsService {
     const intent = await this.findById(intentId);
 
     if (intent.status !== PaymentStatus.PENDING && intent.status !== PaymentStatus.PROCESSING) {
-      throw new BadRequestException(
-        `No se puede aprobar un pago en estado ${intent.status}`,
-      );
+      throw new BadRequestException(`No se puede aprobar un pago en estado ${intent.status}`);
     }
 
     intent.status = PaymentStatus.APPROVED;
@@ -92,9 +88,7 @@ export class PaymentsService {
     const intent = await this.findById(intentId);
 
     if (intent.status === PaymentStatus.APPROVED) {
-      throw new BadRequestException(
-        `No se puede fallar un pago ya aprobado`,
-      );
+      throw new BadRequestException(`No se puede fallar un pago ya aprobado`);
     }
 
     intent.status = PaymentStatus.FAILED;
@@ -106,9 +100,7 @@ export class PaymentsService {
     const intent = await this.findById(intentId);
 
     if (intent.status === PaymentStatus.APPROVED) {
-      throw new BadRequestException(
-        `No se puede cancelar un pago ya aprobado`,
-      );
+      throw new BadRequestException(`No se puede cancelar un pago ya aprobado`);
     }
 
     intent.status = PaymentStatus.CANCELLED;

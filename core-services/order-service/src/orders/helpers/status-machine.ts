@@ -18,5 +18,10 @@ export function canCancel(status: OrderStatus): boolean {
 }
 
 export function canAdminUpdate(status: OrderStatus): boolean {
-  return [OrderStatus.PAID, OrderStatus.SHIPPED, OrderStatus.DELIVERED, OrderStatus.CANCELLED].includes(status);
+  return [
+    OrderStatus.PAID,
+    OrderStatus.SHIPPED,
+    OrderStatus.DELIVERED,
+    OrderStatus.CANCELLED,
+  ].includes(status);
 }

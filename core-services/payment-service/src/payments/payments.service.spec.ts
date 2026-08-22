@@ -7,9 +7,11 @@ import { PaymentStatus } from './enums/payment-status.enum';
 import { PaymentMethod } from './enums/payment-method.enum';
 import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 
-type MockRepo<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
+type MockRepo<T extends object = Record<string, unknown>> = Partial<
+  Record<keyof Repository<T>, jest.Mock>
+>;
 
-const createMockRepo = <T = any>(): MockRepo<T> => ({
+const createMockRepo = <T extends object = Record<string, unknown>>(): MockRepo<T> => ({
   find: jest.fn(),
   findOne: jest.fn(),
   create: jest.fn(),
@@ -47,16 +49,16 @@ describe('PaymentsService', () => {
     };
 
     it('should create a new payment intent and process it', async () => {
-      (paymentRepo.findOne as jest.Mock)
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce(null);
-      (paymentRepo.create as jest.Mock).mockImplementation((entity) => ({
+      (paymentRepo.findOne as jest.Mock).mockResolvedValueOnce(null).mockResolvedValueOnce(null);
+      (paymentRepo.create as jest.Mock).mockImplementation((entity: Record<string, unknown>) => ({
         id: 'intent-uuid-1',
         ...entity,
         createdAt: new Date(),
         updatedAt: new Date(),
       }));
-      (paymentRepo.save as jest.Mock).mockImplementation(async (entity) => entity);
+      (paymentRepo.save as jest.Mock).mockImplementation((entity: Record<string, unknown>) =>
+        Promise.resolve(entity),
+      );
 
       const result = await service.createIntent(dto, 'test-idempotency-key');
 
@@ -91,16 +93,16 @@ describe('PaymentsService', () => {
     });
 
     it('should decline payment when deterministic rule triggers', async () => {
-      (paymentRepo.findOne as jest.Mock)
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce(null);
-      (paymentRepo.create as jest.Mock).mockImplementation((entity) => ({
+      (paymentRepo.findOne as jest.Mock).mockResolvedValueOnce(null).mockResolvedValueOnce(null);
+      (paymentRepo.create as jest.Mock).mockImplementation((entity: Record<string, unknown>) => ({
         id: 'intent-decline',
         ...entity,
         createdAt: new Date(),
         updatedAt: new Date(),
       }));
-      (paymentRepo.save as jest.Mock).mockImplementation(async (entity) => entity);
+      (paymentRepo.save as jest.Mock).mockImplementation((entity: Record<string, unknown>) =>
+        Promise.resolve(entity),
+      );
 
       const declineKey = 'dtest-key';
       const result = await service.createIntent(dto, declineKey);
@@ -110,16 +112,16 @@ describe('PaymentsService', () => {
     });
 
     it('should use generated uuid when no idempotency key provided', async () => {
-      (paymentRepo.findOne as jest.Mock)
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce(null);
-      (paymentRepo.create as jest.Mock).mockImplementation((entity) => ({
+      (paymentRepo.findOne as jest.Mock).mockResolvedValueOnce(null).mockResolvedValueOnce(null);
+      (paymentRepo.create as jest.Mock).mockImplementation((entity: Record<string, unknown>) => ({
         id: 'intent-uuid',
         ...entity,
         createdAt: new Date(),
         updatedAt: new Date(),
       }));
-      (paymentRepo.save as jest.Mock).mockImplementation(async (entity) => entity);
+      (paymentRepo.save as jest.Mock).mockImplementation((entity: Record<string, unknown>) =>
+        Promise.resolve(entity),
+      );
 
       const result = await service.createIntent(dto);
 
@@ -164,7 +166,9 @@ describe('PaymentsService', () => {
     it('should approve a pending payment', async () => {
       const intent = { id: 'i1', status: PaymentStatus.PENDING };
       (paymentRepo.findOne as jest.Mock).mockResolvedValue(intent);
-      (paymentRepo.save as jest.Mock).mockImplementation(async (e) => e);
+      (paymentRepo.save as jest.Mock).mockImplementation((e: Record<string, unknown>) =>
+        Promise.resolve(e),
+      );
 
       const result = await service.approvePayment('i1');
       expect(result.status).toBe(PaymentStatus.APPROVED);
@@ -182,7 +186,9 @@ describe('PaymentsService', () => {
     it('should fail a pending payment', async () => {
       const intent = { id: 'i1', status: PaymentStatus.PENDING };
       (paymentRepo.findOne as jest.Mock).mockResolvedValue(intent);
-      (paymentRepo.save as jest.Mock).mockImplementation(async (e) => e);
+      (paymentRepo.save as jest.Mock).mockImplementation((e: Record<string, unknown>) =>
+        Promise.resolve(e),
+      );
 
       const result = await service.failPayment('i1', 'insufficient funds');
       expect(result.status).toBe(PaymentStatus.FAILED);
@@ -201,7 +207,9 @@ describe('PaymentsService', () => {
     it('should cancel a pending payment', async () => {
       const intent = { id: 'i1', status: PaymentStatus.PENDING };
       (paymentRepo.findOne as jest.Mock).mockResolvedValue(intent);
-      (paymentRepo.save as jest.Mock).mockImplementation(async (e) => e);
+      (paymentRepo.save as jest.Mock).mockImplementation((e: Record<string, unknown>) =>
+        Promise.resolve(e),
+      );
 
       const result = await service.cancelPayment('i1');
       expect(result.status).toBe(PaymentStatus.CANCELLED);

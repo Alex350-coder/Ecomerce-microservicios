@@ -5,7 +5,6 @@ import { OrderStatus } from './enums/order-status.enum';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
-  let service: OrdersService;
 
   const mockService = {
     createOrder: jest.fn(),
@@ -23,7 +22,6 @@ describe('OrdersController', () => {
     }).compile();
 
     controller = module.get<OrdersController>(OrdersController);
-    service = module.get<OrdersService>(OrdersService);
   });
 
   afterEach(() => jest.clearAllMocks());
@@ -53,7 +51,18 @@ describe('OrdersController', () => {
 
       const result = await controller.createOrder(
         { userId: 'u1', email: 'a@b.com', role: 'user' },
-        { items: [], address: { fullName: 'Test', email: 'a@b.com', phone: '123', address: 'St', city: 'C', postalCode: '12345', country: 'US' } },
+        {
+          items: [],
+          address: {
+            fullName: 'Test',
+            email: 'a@b.com',
+            phone: '123',
+            address: 'St',
+            city: 'C',
+            postalCode: '12345',
+            country: 'US',
+          },
+        },
         'idem-key',
       );
 
@@ -65,11 +74,29 @@ describe('OrdersController', () => {
   describe('findMyOrders', () => {
     it('should return user orders', async () => {
       const orders = [
-        { id: 'o1', userId: 'u1', status: OrderStatus.PENDING, items: [], subtotal: 0, shipping: 0, tax: 0, total: 0, shippingMethod: 'standard', addressSnapshot: null, paymentIntentId: null, createdAt: new Date(), updatedAt: new Date() },
+        {
+          id: 'o1',
+          userId: 'u1',
+          status: OrderStatus.PENDING,
+          items: [],
+          subtotal: 0,
+          shipping: 0,
+          tax: 0,
+          total: 0,
+          shippingMethod: 'standard',
+          addressSnapshot: null,
+          paymentIntentId: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ];
       mockService.findByUser.mockResolvedValue(orders);
 
-      const result = await controller.findMyOrders({ userId: 'u1', email: 'a@b.com', role: 'user' });
+      const result = await controller.findMyOrders({
+        userId: 'u1',
+        email: 'a@b.com',
+        role: 'user',
+      });
       expect(result).toHaveLength(1);
     });
   });
@@ -77,7 +104,19 @@ describe('OrdersController', () => {
   describe('findOne', () => {
     it('should return a single order', async () => {
       const order = {
-        id: 'o1', userId: 'u1', status: OrderStatus.PAID, items: [], subtotal: 100, shipping: 5.99, tax: 8, total: 113.99, shippingMethod: 'standard', addressSnapshot: null, paymentIntentId: 'pi-1', createdAt: new Date(), updatedAt: new Date(),
+        id: 'o1',
+        userId: 'u1',
+        status: OrderStatus.PAID,
+        items: [],
+        subtotal: 100,
+        shipping: 5.99,
+        tax: 8,
+        total: 113.99,
+        shippingMethod: 'standard',
+        addressSnapshot: null,
+        paymentIntentId: 'pi-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       mockService.findByIdAndUser.mockResolvedValue(order);
 
@@ -92,7 +131,19 @@ describe('OrdersController', () => {
   describe('cancelOrder', () => {
     it('should cancel an order', async () => {
       const order = {
-        id: 'o1', userId: 'u1', status: OrderStatus.CANCELLED, items: [], subtotal: 100, shipping: 5.99, tax: 8, total: 113.99, shippingMethod: 'standard', addressSnapshot: null, paymentIntentId: null, createdAt: new Date(), updatedAt: new Date(),
+        id: 'o1',
+        userId: 'u1',
+        status: OrderStatus.CANCELLED,
+        items: [],
+        subtotal: 100,
+        shipping: 5.99,
+        tax: 8,
+        total: 113.99,
+        shippingMethod: 'standard',
+        addressSnapshot: null,
+        paymentIntentId: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       mockService.cancelOrder.mockResolvedValue(order);
 
@@ -107,7 +158,21 @@ describe('OrdersController', () => {
   describe('findAllAdmin', () => {
     it('should return all orders for admin', async () => {
       const orders = [
-        { id: 'o1', userId: 'u1', status: OrderStatus.PENDING, items: [], subtotal: 0, shipping: 0, tax: 0, total: 0, shippingMethod: 'standard', addressSnapshot: null, paymentIntentId: null, createdAt: new Date(), updatedAt: new Date() },
+        {
+          id: 'o1',
+          userId: 'u1',
+          status: OrderStatus.PENDING,
+          items: [],
+          subtotal: 0,
+          shipping: 0,
+          tax: 0,
+          total: 0,
+          shippingMethod: 'standard',
+          addressSnapshot: null,
+          paymentIntentId: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ];
       mockService.findAll.mockResolvedValue(orders);
 
@@ -119,7 +184,19 @@ describe('OrdersController', () => {
   describe('adminUpdateStatus', () => {
     it('should update order status', async () => {
       const order = {
-        id: 'o1', userId: 'u1', status: OrderStatus.SHIPPED, items: [], subtotal: 100, shipping: 5.99, tax: 8, total: 113.99, shippingMethod: 'standard', addressSnapshot: null, paymentIntentId: 'pi-1', createdAt: new Date(), updatedAt: new Date(),
+        id: 'o1',
+        userId: 'u1',
+        status: OrderStatus.SHIPPED,
+        items: [],
+        subtotal: 100,
+        shipping: 5.99,
+        tax: 8,
+        total: 113.99,
+        shippingMethod: 'standard',
+        addressSnapshot: null,
+        paymentIntentId: 'pi-1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       mockService.adminUpdateStatus.mockResolvedValue(order);
 

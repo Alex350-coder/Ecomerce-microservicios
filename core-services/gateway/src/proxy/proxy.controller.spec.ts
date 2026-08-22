@@ -27,6 +27,7 @@ describe('ProxyController', () => {
 
     await controller.proxy(req, res);
 
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(proxyService.forward).toHaveBeenCalledWith(req, res);
   });
 });

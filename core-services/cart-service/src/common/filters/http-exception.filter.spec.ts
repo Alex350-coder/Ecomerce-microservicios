@@ -18,7 +18,9 @@ describe('HttpExceptionFilter', () => {
     const status = jest.fn().mockReturnValue({ json });
     filter.catch(new HttpException('Not found', HttpStatus.NOT_FOUND), mockHost(json, status));
     expect(status).toHaveBeenCalledWith(404);
-    expect(json).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 404, message: 'Not found' }));
+    expect(json).toHaveBeenCalledWith(
+      expect.objectContaining({ statusCode: 404, message: 'Not found' }),
+    );
   });
 
   it('returns 500 for unknown errors', () => {
@@ -39,7 +41,7 @@ describe('HttpExceptionFilter', () => {
     const json = jest.fn();
     const status = jest.fn().mockReturnValue({ json });
     filter.catch(new Error('boom'), mockHost(json, status));
-    const body = json.mock.calls[0][0];
+    const body = (json.mock.calls as unknown[][])[0][0] as Record<string, unknown>;
     expect(body.requestId).toBeDefined();
   });
 
@@ -60,6 +62,8 @@ describe('HttpExceptionFilter', () => {
       new HttpException({ message: 'Conflict', error: 'Conflict' }, HttpStatus.CONFLICT),
       mockHost(json, status),
     );
-    expect(json).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 409, error: 'Conflict' }));
+    expect(json).toHaveBeenCalledWith(
+      expect.objectContaining({ statusCode: 409, error: 'Conflict' }),
+    );
   });
 });

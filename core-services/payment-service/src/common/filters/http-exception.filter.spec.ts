@@ -65,7 +65,7 @@ describe('HttpExceptionFilter', () => {
 
     filter.catch(new Error('boom'), mockHost(json, status));
 
-    const body = json.mock.calls[0][0];
+    const body = (json.mock.calls as unknown[][])[0][0] as Record<string, unknown>;
     expect(body.requestId).toBeDefined();
     expect(typeof body.requestId).toBe('string');
   });
