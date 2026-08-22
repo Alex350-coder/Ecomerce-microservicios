@@ -7,11 +7,12 @@ import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { SagaOrchestrator } from './helpers/saga-orchestrator';
 import { AuthModule } from '../auth/auth.module';
+import { RequestContextService } from '../common/request-context.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Order, OrderItem, Idempotency]), AuthModule],
   controllers: [OrdersController],
-  providers: [OrdersService, SagaOrchestrator],
+  providers: [OrdersService, SagaOrchestrator, RequestContextService],
   exports: [OrdersService],
 })
 export class OrdersModule {}

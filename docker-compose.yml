@@ -158,6 +158,7 @@ services:
       DB_PASSWORD: ${CART_DB_PASSWORD:?set CART_DB_PASSWORD en .env}
       DB_DATABASE: cart_db
       DB_SYNCHRONIZE: "false"
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET en .env}
     depends_on:
       mysql:
         condition: service_healthy
@@ -182,6 +183,7 @@ services:
       DB_PASSWORD: ${ORDER_DB_PASSWORD:?set ORDER_DB_PASSWORD en .env}
       DB_DATABASE: order_db
       DB_SYNCHRONIZE: "false"
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET en .env}
     depends_on:
       mysql:
         condition: service_healthy
@@ -206,6 +208,7 @@ services:
       DB_PASSWORD: ${INVENTORY_DB_PASSWORD:?set INVENTORY_DB_PASSWORD en .env}
       DB_DATABASE: inventory_db
       DB_SYNCHRONIZE: "false"
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET en .env}
     depends_on:
       mysql:
         condition: service_healthy
@@ -230,6 +233,7 @@ services:
       DB_PASSWORD: ${PAYMENT_DB_PASSWORD:?set PAYMENT_DB_PASSWORD en .env}
       DB_DATABASE: payment_db
       DB_SYNCHRONIZE: "false"
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET en .env}
     depends_on:
       mysql:
         condition: service_healthy
