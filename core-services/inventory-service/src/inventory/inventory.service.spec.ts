@@ -10,17 +10,29 @@ describe('InventoryService', () => {
   let repo: jest.Mocked<Repository<InventoryItem>>;
   let dataSource: jest.Mocked<DataSource>;
 
-  const mockItem = (overrides: Partial<InventoryItem> = {}): InventoryItem =>
-    ({
-      id: 'inv-uuid-1',
-      productId: 'prod-uuid-1',
-      quantity: 100,
-      reserved: 10,
-      version: 1,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      ...overrides,
-    }) as InventoryItem;
+  const mockItem = (overrides: Partial<InventoryItem> = {}): InventoryItem => ({
+    id: 'inv-uuid-1',
+    productId: 'prod-uuid-1',
+    quantity: 100,
+    reserved: 10,
+    version: 1,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mockTransaction = () => {
+    const manager = {
+      findOne: jest.fn(),
+      save: jest.fn(),
+    };
+    dataSource.transaction.mockImplementation((...args: unknown[]) => {
+      const callback = typeof args[0] === 'function' ? args[0] : args[1];
+      return Promise.resolve((callback as (m: typeof manager) => unknown)(manager));
+    });
+    return manager;
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -101,6 +113,7 @@ describe('InventoryService', () => {
 
       const result = await service.adjust({ productId: 'new-prod', quantity: 50 });
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(repo.create).toHaveBeenCalledWith({
         productId: 'new-prod',
         quantity: 50,
@@ -126,13 +139,9 @@ describe('InventoryService', () => {
   describe('reserve', () => {
     it('reserves stock when available', async () => {
       const item = mockItem({ quantity: 100, reserved: 10 });
-      dataSource.transaction.mockImplementation(async (fn: any) => {
-        const manager = {
-          findOne: jest.fn().mockResolvedValue(item),
-          save: jest.fn().mockResolvedValue(item),
-        };
-        return fn(manager);
-      });
+      const manager = mockTransaction();
+      manager.findOne.mockResolvedValue(item);
+      manager.save.mockResolvedValue(item);
 
       const result = await service.reserve({
         items: [{ productId: 'prod-uuid-1', quantity: 5 }],
@@ -144,13 +153,8 @@ describe('InventoryService', () => {
 
     it('marks unavailable when stock insufficient', async () => {
       const item = mockItem({ quantity: 10, reserved: 8 });
-      dataSource.transaction.mockImplementation(async (fn: any) => {
-        const manager = {
-          findOne: jest.fn().mockResolvedValue(item),
-          save: jest.fn(),
-        };
-        return fn(manager);
-      });
+      const manager = mockTransaction();
+      manager.findOne.mockResolvedValue(item);
 
       const result = await service.reserve({
         items: [{ productId: 'prod-uuid-1', quantity: 5 }],
@@ -160,13 +164,8 @@ describe('InventoryService', () => {
     });
 
     it('marks unavailable when product not found', async () => {
-      dataSource.transaction.mockImplementation(async (fn: any) => {
-        const manager = {
-          findOne: jest.fn().mockResolvedValue(null),
-          save: jest.fn(),
-        };
-        return fn(manager);
-      });
+      const manager = mockTransaction();
+      manager.findOne.mockResolvedValue(null);
 
       const result = await service.reserve({
         items: [{ productId: 'missing', quantity: 1 }],
@@ -176,13 +175,8 @@ describe('InventoryService', () => {
     });
 
     it('generates reservationId when not provided', async () => {
-      dataSource.transaction.mockImplementation(async (fn: any) => {
-        const manager = {
-          findOne: jest.fn().mockResolvedValue(null),
-          save: jest.fn(),
-        };
-        return fn(manager);
-      });
+      const manager = mockTransaction();
+      manager.findOne.mockResolvedValue(null);
 
       const result = await service.reserve({
         items: [{ productId: 'missing', quantity: 1 }],
@@ -196,13 +190,9 @@ describe('InventoryService', () => {
   describe('commit', () => {
     it('deducts quantity and reserved when sufficient reservation exists', async () => {
       const item = mockItem({ quantity: 100, reserved: 20 });
-      dataSource.transaction.mockImplementation(async (fn: any) => {
-        const manager = {
-          findOne: jest.fn().mockResolvedValue(item),
-          save: jest.fn().mockResolvedValue(item),
-        };
-        return fn(manager);
-      });
+      const manager = mockTransaction();
+      manager.findOne.mockResolvedValue(item);
+      manager.save.mockResolvedValue(item);
 
       await service.commit({ items: [{ productId: 'prod-uuid-1', quantity: 10 }] });
 
@@ -211,13 +201,8 @@ describe('InventoryService', () => {
     });
 
     it('throws NotFoundException when product not found', async () => {
-      dataSource.transaction.mockImplementation(async (fn: any) => {
-        const manager = {
-          findOne: jest.fn().mockResolvedValue(null),
-          save: jest.fn(),
-        };
-        return fn(manager);
-      });
+      const manager = mockTransaction();
+      manager.findOne.mockResolvedValue(null);
 
       await expect(
         service.commit({ items: [{ productId: 'missing', quantity: 1 }] }),
@@ -226,13 +211,8 @@ describe('InventoryService', () => {
 
     it('throws BadRequestException when reservation insufficient', async () => {
       const item = mockItem({ quantity: 100, reserved: 3 });
-      dataSource.transaction.mockImplementation(async (fn: any) => {
-        const manager = {
-          findOne: jest.fn().mockResolvedValue(item),
-          save: jest.fn(),
-        };
-        return fn(manager);
-      });
+      const manager = mockTransaction();
+      manager.findOne.mockResolvedValue(item);
 
       await expect(
         service.commit({ items: [{ productId: 'prod-uuid-1', quantity: 10 }] }),
@@ -243,13 +223,9 @@ describe('InventoryService', () => {
   describe('release', () => {
     it('releases reserved stock', async () => {
       const item = mockItem({ quantity: 100, reserved: 20 });
-      dataSource.transaction.mockImplementation(async (fn: any) => {
-        const manager = {
-          findOne: jest.fn().mockResolvedValue(item),
-          save: jest.fn().mockResolvedValue(item),
-        };
-        return fn(manager);
-      });
+      const manager = mockTransaction();
+      manager.findOne.mockResolvedValue(item);
+      manager.save.mockResolvedValue(item);
 
       await service.release({ items: [{ productId: 'prod-uuid-1', quantity: 5 }] });
 
@@ -258,13 +234,9 @@ describe('InventoryService', () => {
 
     it('floors reserved at zero', async () => {
       const item = mockItem({ quantity: 100, reserved: 2 });
-      dataSource.transaction.mockImplementation(async (fn: any) => {
-        const manager = {
-          findOne: jest.fn().mockResolvedValue(item),
-          save: jest.fn().mockResolvedValue(item),
-        };
-        return fn(manager);
-      });
+      const manager = mockTransaction();
+      manager.findOne.mockResolvedValue(item);
+      manager.save.mockResolvedValue(item);
 
       await service.release({ items: [{ productId: 'prod-uuid-1', quantity: 10 }] });
 
@@ -272,13 +244,8 @@ describe('InventoryService', () => {
     });
 
     it('throws NotFoundException when product not found', async () => {
-      dataSource.transaction.mockImplementation(async (fn: any) => {
-        const manager = {
-          findOne: jest.fn().mockResolvedValue(null),
-          save: jest.fn(),
-        };
-        return fn(manager);
-      });
+      const manager = mockTransaction();
+      manager.findOne.mockResolvedValue(null);
 
       await expect(
         service.release({ items: [{ productId: 'missing', quantity: 1 }] }),

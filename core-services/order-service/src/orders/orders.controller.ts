@@ -30,11 +30,7 @@ export class OrdersController {
     @Body() dto: CreateOrderDto,
     @Headers('idempotency-key') idempotencyKey?: string,
   ) {
-    const order = await this.ordersService.createOrder(
-      user.userId,
-      dto,
-      idempotencyKey,
-    );
+    const order = await this.ordersService.createOrder(user.userId, dto, idempotencyKey);
     return this.formatOrder(order);
   }
 
@@ -45,10 +41,7 @@ export class OrdersController {
   }
 
   @Get(':id')
-  async findOne(
-    @CurrentUser() user: JwtUser,
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ) {
+  async findOne(@CurrentUser() user: JwtUser, @Param('id', new ParseUUIDPipe()) id: string) {
     const order = await this.ordersService.findByIdAndUser(id, user.userId);
     return this.formatOrder(order);
   }

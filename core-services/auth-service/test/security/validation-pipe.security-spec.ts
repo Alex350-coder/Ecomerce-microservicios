@@ -23,7 +23,10 @@ describe('Security: ValidationPipe (auth-service)', () => {
       };
 
       const dto = plainToInstance(RegisterDto, input);
-      const result = await pipe.transform(dto, { type: 'body', metatype: RegisterDto });
+      const result = (await pipe.transform(dto, { type: 'body', metatype: RegisterDto })) as Record<
+        string,
+        unknown
+      >;
 
       expect(result).not.toHaveProperty('role');
       expect(result).not.toHaveProperty('hackField');
@@ -45,9 +48,9 @@ describe('Security: ValidationPipe (auth-service)', () => {
       };
 
       const dto = plainToInstance(RegisterDto, input);
-      await expect(
-        pipe.transform(dto, { type: 'body', metatype: RegisterDto }),
-      ).rejects.toThrow(BadRequestException);
+      await expect(pipe.transform(dto, { type: 'body', metatype: RegisterDto })).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('strips unknown fields from login payload', async () => {
@@ -65,7 +68,10 @@ describe('Security: ValidationPipe (auth-service)', () => {
       };
 
       const dto = plainToInstance(LoginDto, input);
-      const result = await pipe.transform(dto, { type: 'body', metatype: LoginDto });
+      const result = (await pipe.transform(dto, { type: 'body', metatype: LoginDto })) as Record<
+        string,
+        unknown
+      >;
 
       expect(result).not.toHaveProperty('mfaCode');
       expect(result).not.toHaveProperty('isAdmin');
@@ -88,7 +94,10 @@ describe('Security: ValidationPipe (auth-service)', () => {
       };
 
       const dto = plainToInstance(RegisterDto, input);
-      const result = await pipe.transform(dto, { type: 'body', metatype: RegisterDto });
+      const result = (await pipe.transform(dto, { type: 'body', metatype: RegisterDto })) as Record<
+        string,
+        unknown
+      >;
 
       expect(typeof result.email).toBe('string');
       expect(typeof result.password).toBe('string');
@@ -115,7 +124,7 @@ describe('Security: ValidationPipe (auth-service)', () => {
         lastName: 'User',
       });
       const errors = await validate(dto);
-      expect(errors.some(e => e.property === 'password')).toBe(true);
+      expect(errors.some((e) => e.property === 'password')).toBe(true);
     });
   });
 });

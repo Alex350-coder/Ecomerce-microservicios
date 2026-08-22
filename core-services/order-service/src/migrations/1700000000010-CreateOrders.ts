@@ -37,14 +37,18 @@ export class CreateOrders1700000000010 implements MigrationInterface {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
-    await queryRunner.query(`
+    await queryRunner.query(
+      `
       CREATE TABLE IF NOT EXISTS idempotency (
-        ` + '`key`' + ` VARCHAR(36) NOT NULL PRIMARY KEY,
+        ` +
+        '`key`' +
+        ` VARCHAR(36) NOT NULL PRIMARY KEY,
         resource_id VARCHAR(36) NOT NULL,
         resource_type VARCHAR(50) NOT NULL,
         created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `);
+    `,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

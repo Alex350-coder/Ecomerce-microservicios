@@ -7,12 +7,14 @@ import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { Idempotency } from './entities/idempotency.entity';
 import { OrderStatus } from './enums/order-status.enum';
-import { BadRequestException, ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { RequestContextService } from '../common/request-context.service';
 
-type MockRepo<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
+type MockRepo<T extends object = Record<string, unknown>> = Partial<
+  Record<keyof Repository<T>, jest.Mock>
+>;
 
-const createMockRepo = <T = any>(): MockRepo<T> => ({
+const createMockRepo = <T extends object = Record<string, unknown>>(): MockRepo<T> => ({
   find: jest.fn(),
   findOne: jest.fn(),
   create: jest.fn(),
@@ -89,7 +91,7 @@ describe('OrdersService', () => {
     it('should cancel a PENDING order', async () => {
       const order = { id: 'o1', userId: 'u1', status: OrderStatus.PENDING, items: [] };
       orderRepo.findOne!.mockResolvedValue(order);
-      orderRepo.save!.mockImplementation(async (e) => e);
+      orderRepo.save!.mockImplementation((e) => Promise.resolve(e));
 
       const result = await service.cancelOrder('o1', 'u1');
       expect(result.status).toBe(OrderStatus.CANCELLED);
@@ -105,7 +107,10 @@ describe('OrdersService', () => {
 
   describe('findAll', () => {
     it('should return all orders', async () => {
-      const orders = [{ id: 'o1', items: [] }, { id: 'o2', items: [] }];
+      const orders = [
+        { id: 'o1', items: [] },
+        { id: 'o2', items: [] },
+      ];
       orderRepo.find!.mockResolvedValue(orders);
 
       const result = await service.findAll();
@@ -117,7 +122,7 @@ describe('OrdersService', () => {
     it('should update order status with valid transition', async () => {
       const order = { id: 'o1', userId: 'u1', status: OrderStatus.PAID, items: [] };
       orderRepo.findOne!.mockResolvedValue(order);
-      orderRepo.save!.mockImplementation(async (e) => e);
+      orderRepo.save!.mockImplementation((e) => Promise.resolve(e));
 
       const result = await service.adminUpdateStatus('o1', { status: OrderStatus.SHIPPED });
       expect(result.status).toBe(OrderStatus.SHIPPED);
@@ -127,9 +132,9 @@ describe('OrdersService', () => {
       const order = { id: 'o1', userId: 'u1', status: OrderStatus.CANCELLED, items: [] };
       orderRepo.findOne!.mockResolvedValue(order);
 
-      await expect(
-        service.adminUpdateStatus('o1', { status: OrderStatus.PAID }),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.adminUpdateStatus('o1', { status: OrderStatus.PAID })).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw NotFoundException when order not found', async () => {
@@ -150,10 +155,22 @@ describe('OrdersService', () => {
       });
       orderRepo.findOne!.mockResolvedValue(existingOrder);
 
-      const result = await service.createOrder('u1', {
-        items: [{ productId: 'p1', productName: 'Test', price: 10, quantity: 1 }],
-        address: { fullName: 'Test', email: 'a@b.com', phone: '123', address: 'St', city: 'C', postalCode: '12345', country: 'US' },
-      }, 'existing-key');
+      const result = await service.createOrder(
+        'u1',
+        {
+          items: [{ productId: 'p1', productName: 'Test', price: 10, quantity: 1 }],
+          address: {
+            fullName: 'Test',
+            email: 'a@b.com',
+            phone: '123',
+            address: 'St',
+            city: 'C',
+            postalCode: '12345',
+            country: 'US',
+          },
+        },
+        'existing-key',
+      );
 
       expect(result.id).toBe('existing-o');
       expect(orderRepo.create).not.toHaveBeenCalled();
@@ -178,6 +195,7 @@ describe('OrdersService', () => {
       };
 
       const originalFetch = global.fetch;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 503 }) as any;
 
       idempotencyRepo.findOne!.mockResolvedValue({
@@ -187,15 +205,27 @@ describe('OrdersService', () => {
       orderRepo.findOne!.mockResolvedValueOnce(null);
       orderRepo.findOne!.mockResolvedValue({ ...newOrder, items: [] });
       orderRepo.create!.mockReturnValue(newOrder);
-      orderRepo.save!.mockImplementation(async (e) => e);
+      orderRepo.save!.mockImplementation((e) => Promise.resolve(e));
       orderItemRepo.save!.mockResolvedValue([]);
       idempotencyRepo.save!.mockResolvedValue({});
 
       try {
-        const result = await service.createOrder('u1', {
-          items: [{ productId: 'p1', productName: 'Test', price: 10, quantity: 1 }],
-          address: { fullName: 'Test', email: 'a@b.com', phone: '123', address: 'St', city: 'C', postalCode: '12345', country: 'US' },
-        }, 'key1');
+        const result = await service.createOrder(
+          'u1',
+          {
+            items: [{ productId: 'p1', productName: 'Test', price: 10, quantity: 1 }],
+            address: {
+              fullName: 'Test',
+              email: 'a@b.com',
+              phone: '123',
+              address: 'St',
+              city: 'C',
+              postalCode: '12345',
+              country: 'US',
+            },
+          },
+          'key1',
+        );
 
         expect(result).toBeDefined();
         expect(result.id).toBe('new-o');
@@ -212,15 +242,39 @@ describe('OrdersService', () => {
       });
       orderRepo.findOne!.mockResolvedValue(existingOrder);
 
-      const result1 = await service.createOrder('u1', {
-        items: [{ productId: 'p1', productName: 'Test', price: 10, quantity: 1 }],
-        address: { fullName: 'Test', email: 'a@b.com', phone: '123', address: 'St', city: 'C', postalCode: '12345', country: 'US' },
-      }, 'retry-key');
+      const result1 = await service.createOrder(
+        'u1',
+        {
+          items: [{ productId: 'p1', productName: 'Test', price: 10, quantity: 1 }],
+          address: {
+            fullName: 'Test',
+            email: 'a@b.com',
+            phone: '123',
+            address: 'St',
+            city: 'C',
+            postalCode: '12345',
+            country: 'US',
+          },
+        },
+        'retry-key',
+      );
 
-      const result2 = await service.createOrder('u1', {
-        items: [{ productId: 'p1', productName: 'Test', price: 10, quantity: 1 }],
-        address: { fullName: 'Test', email: 'a@b.com', phone: '123', address: 'St', city: 'C', postalCode: '12345', country: 'US' },
-      }, 'retry-key');
+      const result2 = await service.createOrder(
+        'u1',
+        {
+          items: [{ productId: 'p1', productName: 'Test', price: 10, quantity: 1 }],
+          address: {
+            fullName: 'Test',
+            email: 'a@b.com',
+            phone: '123',
+            address: 'St',
+            city: 'C',
+            postalCode: '12345',
+            country: 'US',
+          },
+        },
+        'retry-key',
+      );
 
       expect(result1.id).toBe('order-123');
       expect(result2.id).toBe('order-123');

@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ConflictException,
   ForbiddenException,
   Injectable,
   Logger,
@@ -50,15 +49,10 @@ export class OrdersService {
   ) {
     this.inventoryUrl =
       configService.get<string>('INVENTORY_SERVICE_URL') ?? 'http://localhost:3006';
-    this.paymentUrl =
-      configService.get<string>('PAYMENT_SERVICE_URL') ?? 'http://localhost:3007';
+    this.paymentUrl = configService.get<string>('PAYMENT_SERVICE_URL') ?? 'http://localhost:3007';
   }
 
-  async createOrder(
-    userId: string,
-    dto: CreateOrderDto,
-    idempotencyKey?: string,
-  ): Promise<Order> {
+  async createOrder(userId: string, dto: CreateOrderDto, idempotencyKey?: string): Promise<Order> {
     const key = idempotencyKey ?? dto.idempotencyKey ?? crypto.randomUUID();
 
     const existingIdempotency = await this.idempotencyRepo.findOne({
@@ -113,7 +107,7 @@ export class OrdersService {
     try {
       await this.executeSaga(savedOrder, dto.items);
     } catch (error) {
-      this.logger.error(`Saga failed for order ${savedOrder.id}: ${error}`);
+      this.logger.error(`Saga failed for order ${savedOrder.id}: ${String(error)}`);
     }
 
     return this.orderRepo.findOne({
@@ -122,10 +116,7 @@ export class OrdersService {
     }) as Promise<Order>;
   }
 
-  private async executeSaga(
-    order: Order,
-    items: CreateOrderDto['items'],
-  ): Promise<void> {
+  private async executeSaga(order: Order, items: CreateOrderDto['items']): Promise<void> {
     this.logger.log(`Executing saga for order ${order.id}`);
 
     const reservationId = crypto.randomUUID();
@@ -157,13 +148,13 @@ export class OrdersService {
         this.logger.warn(`Order ${order.id} FAILED - payment declined`);
       }
     } catch (error) {
-      this.logger.error(`Saga error for order ${order.id}: ${error}`);
+      this.logger.error(`Saga error for order ${order.id}: ${String(error)}`);
 
       if (reservationSuccess) {
         try {
           await this.releaseStock(items, reservationId);
         } catch (releaseError) {
-          this.logger.error(`Compensation release failed: ${releaseError}`);
+          this.logger.error(`Compensation release failed: ${String(releaseError)}`);
         }
       }
 
@@ -196,10 +187,7 @@ export class OrdersService {
     return response.json() as Promise<InventoryResponse>;
   }
 
-  private async commitStock(
-    items: CreateOrderDto['items'],
-    reservationId: string,
-  ): Promise<void> {
+  private async commitStock(items: CreateOrderDto['items'], reservationId: string): Promise<void> {
     const requestId = this.requestContext.getRequestId();
     const response = await fetchWithTimeout(`${this.inventoryUrl}/inventory/commit`, {
       method: 'POST',
@@ -218,10 +206,7 @@ export class OrdersService {
     }
   }
 
-  private async releaseStock(
-    items: CreateOrderDto['items'],
-    reservationId: string,
-  ): Promise<void> {
+  private async releaseStock(items: CreateOrderDto['items'], reservationId: string): Promise<void> {
     const requestId = this.requestContext.getRequestId();
     const response = await fetchWithTimeout(`${this.inventoryUrl}/inventory/release`, {
       method: 'POST',
@@ -298,13 +283,12 @@ export class OrdersService {
     return order;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async cancelOrder(id: string, userId: string, dto?: CancelOrderDto): Promise<Order> {
     const order = await this.findByIdAndUser(id, userId);
 
     if (!canCancel(order.status)) {
-      throw new BadRequestException(
-        `No se puede cancelar un pedido en estado ${order.status}`,
-      );
+      throw new BadRequestException(`No se puede cancelar un pedido en estado ${order.status}`);
     }
 
     order.status = OrderStatus.CANCELLED;
@@ -336,9 +320,7 @@ export class OrdersService {
     }
 
     if (!isValidTransition(order.status, dto.status)) {
-      throw new BadRequestException(
-        `Transición inválida: ${order.status} → ${dto.status}`,
-      );
+      throw new BadRequestException(`Transición inválida: ${order.status} → ${dto.status}`);
     }
 
     order.status = dto.status;

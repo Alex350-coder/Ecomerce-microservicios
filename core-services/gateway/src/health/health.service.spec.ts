@@ -24,15 +24,21 @@ describe('HealthService', () => {
   });
 
   it('returns ok status with upstream health', async () => {
-    const mockRes = { statusCode: 200, resume: jest.fn(), on: jest.fn((_, cb) => cb()) };
     (http.get as jest.Mock).mockReturnValue({ on: jest.fn() });
 
-    // Mock the response stream
-    (http.get as jest.Mock).mockImplementation((_url: any, _opts: any, cb: any) => {
-      const res = { statusCode: 200, resume: jest.fn(), on: jest.fn((event: string, handler: Function) => { if (event === 'end') handler(); }) };
-      cb(res);
-      return { on: jest.fn() };
-    });
+    (http.get as jest.Mock).mockImplementation(
+      (_url: unknown, _opts: unknown, cb: (res: unknown) => void) => {
+        const res = {
+          statusCode: 200,
+          resume: jest.fn(),
+          on: jest.fn((event: string, handler: () => void) => {
+            if (event === 'end') handler();
+          }),
+        };
+        cb(res);
+        return { on: jest.fn() };
+      },
+    );
 
     const report = await service.report();
 

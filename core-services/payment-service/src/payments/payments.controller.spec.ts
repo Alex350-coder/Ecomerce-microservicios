@@ -52,6 +52,7 @@ describe('PaymentsController', () => {
 
       expect(result.id).toBe('intent-1');
       expect(result.status).toBe(PaymentStatus.APPROVED);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(service.createIntent).toHaveBeenCalled();
     });
   });

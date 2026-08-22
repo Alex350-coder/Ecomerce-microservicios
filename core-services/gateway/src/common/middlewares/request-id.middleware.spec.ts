@@ -9,7 +9,11 @@ describe('RequestIdMiddleware', () => {
   });
 
   const mockReqRes = (headers: Record<string, unknown> = {}) => {
-    const req = { headers: { ...headers }, method: 'GET', originalUrl: '/test' } as unknown as Request;
+    const req = {
+      headers: { ...headers },
+      method: 'GET',
+      originalUrl: '/test',
+    } as unknown as Request;
     const res = {
       setHeader: jest.fn(),
       on: jest.fn(),
@@ -33,6 +37,7 @@ describe('RequestIdMiddleware', () => {
     middleware.use(req, res, next);
 
     expect(req.headers['x-request-id']).toBe('existing-id');
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(res.setHeader).toHaveBeenCalledWith('x-request-id', 'existing-id');
   });
 
@@ -44,7 +49,7 @@ describe('RequestIdMiddleware', () => {
     const id = req.headers['x-request-id'] as string;
     expect(id).toBeDefined();
     expect(id.length).toBeGreaterThan(0);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(res.setHeader).toHaveBeenCalledWith('x-request-id', id);
   });
-
 });

@@ -19,11 +19,7 @@ export async function fetchWithTimeout(
   url: string,
   options: FetchWithTimeoutOptions = {},
 ): Promise<Response> {
-  const {
-    timeoutMs = DEFAULT_TIMEOUT_MS,
-    maxRetries = MAX_RETRIES,
-    ...fetchOptions
-  } = options;
+  const { timeoutMs = DEFAULT_TIMEOUT_MS, maxRetries = MAX_RETRIES, ...fetchOptions } = options;
 
   let lastError: Error | undefined;
 
@@ -63,5 +59,5 @@ export async function fetchWithTimeout(
     }
   }
 
-  throw lastError;
+  throw lastError ?? new Error('Fetch failed after retries');
 }

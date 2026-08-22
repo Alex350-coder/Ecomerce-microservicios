@@ -2,7 +2,9 @@ import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
 
 describe('JwtStrategy', () => {
-  const configService = { get: jest.fn().mockReturnValue('test-secret') } as unknown as ConfigService;
+  const configService = {
+    get: jest.fn().mockReturnValue('test-secret'),
+  } as unknown as ConfigService;
   const strategy = new JwtStrategy(configService);
 
   it('returns userId, email, and role from the JWT payload', () => {

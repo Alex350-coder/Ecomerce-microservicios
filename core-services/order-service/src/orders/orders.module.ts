@@ -9,10 +9,7 @@ import { SagaOrchestrator } from './helpers/saga-orchestrator';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Order, OrderItem, Idempotency]),
-    AuthModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Order, OrderItem, Idempotency]), AuthModule],
   controllers: [OrdersController],
   providers: [OrdersService, SagaOrchestrator],
   exports: [OrdersService],

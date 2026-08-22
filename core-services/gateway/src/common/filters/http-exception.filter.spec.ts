@@ -18,7 +18,9 @@ describe('HttpExceptionFilter', () => {
     const status = jest.fn().mockReturnValue({ json });
     filter.catch(new HttpException('Not found', HttpStatus.NOT_FOUND), mockHost(json, status));
     expect(status).toHaveBeenCalledWith(404);
-    expect(json).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 404, message: 'Not found' }));
+    expect(json).toHaveBeenCalledWith(
+      expect.objectContaining({ statusCode: 404, message: 'Not found' }),
+    );
   });
 
   it('returns 500 for unknown errors', () => {

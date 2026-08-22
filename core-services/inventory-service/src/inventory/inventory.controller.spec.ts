@@ -7,17 +7,16 @@ describe('InventoryController', () => {
   let controller: InventoryController;
   let service: jest.Mocked<InventoryService>;
 
-  const mockItem = (overrides: Partial<InventoryItem> = {}): InventoryItem =>
-    ({
-      id: 'inv-uuid-1',
-      productId: 'prod-uuid-1',
-      quantity: 100,
-      reserved: 10,
-      version: 1,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      ...overrides,
-    }) as InventoryItem;
+  const mockItem = (overrides: Partial<InventoryItem> = {}): InventoryItem => ({
+    id: 'inv-uuid-1',
+    productId: 'prod-uuid-1',
+    quantity: 100,
+    reserved: 10,
+    version: 1,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -58,12 +57,11 @@ describe('InventoryController', () => {
 
   describe('getBulk', () => {
     it('parses comma-separated ids and returns mapped items', async () => {
-      service.getBulk.mockResolvedValue([
-        mockItem({ productId: 'a', quantity: 50, reserved: 5 }),
-      ]);
+      service.getBulk.mockResolvedValue([mockItem({ productId: 'a', quantity: 50, reserved: 5 })]);
 
       const result = await controller.getBulk('a,b');
 
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(service.getBulk).toHaveBeenCalledWith(['a', 'b']);
       expect(result[0].available).toBe(45);
     });
@@ -97,7 +95,7 @@ describe('InventoryController', () => {
 
       const result = await controller.reserve({
         items: [{ productId: 'prod-uuid-1', quantity: 5 }],
-      } as any);
+      });
 
       expect(result.reservationId).toBe('res-123');
     });
@@ -107,7 +105,9 @@ describe('InventoryController', () => {
     it('returns success', async () => {
       service.commit.mockResolvedValue();
 
-      const result = await controller.commit({ items: [{ productId: 'prod-uuid-1', quantity: 5 }] } as any);
+      const result = await controller.commit({
+        items: [{ productId: 'prod-uuid-1', quantity: 5 }],
+      });
 
       expect(result).toEqual({ success: true });
     });
@@ -117,7 +117,9 @@ describe('InventoryController', () => {
     it('returns success', async () => {
       service.release.mockResolvedValue();
 
-      const result = await controller.release({ items: [{ productId: 'prod-uuid-1', quantity: 5 }] } as any);
+      const result = await controller.release({
+        items: [{ productId: 'prod-uuid-1', quantity: 5 }],
+      });
 
       expect(result).toEqual({ success: true });
     });
