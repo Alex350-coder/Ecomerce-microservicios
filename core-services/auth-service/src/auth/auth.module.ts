@@ -10,6 +10,7 @@ import { JwtStrategy } from './strategies/jwt.strategy/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { UserSyncService } from './internal/user-sync.service';
+import { RequestContextService } from '../common/request-context.service';
 
 @Module({
   imports: [
@@ -26,7 +27,14 @@ import { UserSyncService } from './internal/user-sync.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard, RolesGuard, UserSyncService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    JwtAuthGuard,
+    RolesGuard,
+    UserSyncService,
+    RequestContextService,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}
