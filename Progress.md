@@ -21,7 +21,7 @@ Estado real por fase del plan `Planning_files/04-ROADMAP.md`. Única fuente de e
 | F10 | Seguridad (hardening + security tests) | DONE |
 | F11 | Testing + CI (gates obligatorios, e2e) | DONE (2026-08-21) |
 | F12 | Observabilidad (logs correlacionados + health ready) | DONE (2026-08-21) |
-| F13 | Docs + portfolio (documentación completa y veraz) | Pendiente |
+| F13 | Docs + portfolio (documentación completa y veraz) | DONE (2026-08-22) |
 
 ## Fase 0 — Higiene del repositorio y tooling
 
@@ -298,3 +298,44 @@ Estado real por fase del plan `Planning_files/04-ROADMAP.md`. Única fuente de e
 - Idempotency verificada: PASS (test verify)
 - Health retorna 503 cuando upstreams caen: PASS
 - Security events sin datos sensibles: PASS
+
+## Fase 13 — Docs + Portfolio
+
+- [x] README completo con arquitectura, stack, puesta en marcha, CI/CD y links a documentacion
+- [x] `docs/ARCHITECTURE.md` — diagrama de servicios, ownership, contratos, ADRs
+- [x] `docs/API-INVENTORY.md` — 6 endpoints de inventory-service
+- [x] `docs/API-PAYMENTS.md` — 3 endpoints de payment-service
+- [x] `docs/PAYMENT-SIMULATION.md` — reglas del simulador de pagos
+- [x] `docs/API-ORDERS.md` — 5 endpoints de order-service + saga + transiciones
+- [x] `docs/UI-GUIDE.md` — design tokens, componentes, layouts, paginas, convenciones
+- [x] `docs/DEPLOYMENT.md` — docker, env vars, migraciones, seeds, CI/CD, troubleshooting
+- [x] `Plan.md` — resumen del master plan con links a planning files
+- [x] `Tasks.md` — checklist operativo por fase
+- [x] `docs/DEMO.md` — guia de demostracion para portafolio (10 min)
+- [x] Progress.md actualizado con F13 = DONE
+
+**Criterios de aceptacion:**
+
+- README.md refleja el estado real del proyecto (no esqueleto)
+- Todos los archivos de documentacion existen y son correctos (verificados contra codigo)
+- Plan.md + Tasks.md creados (no existian previamente)
+- DEMO.md con guia paso a paso para entrevistas
+- Progress.md refleja las 14 fases (F0-F13) como DONE
+- Sin inventar endpoints o features que no existan en el codigo
+
+**Archivos creados/actualizados en F13:**
+
+| Archivo | Accion |
+|---------|--------|
+| `README.md` | Reescrito completamente |
+| `Plan.md` | Creado (nuevo) |
+| `Tasks.md` | Creado (nuevo) |
+| `docs/ARCHITECTURE.md` | Creado (nuevo) |
+| `docs/API-INVENTORY.md` | Creado (nuevo) |
+| `docs/API-PAYMENTS.md` | Creado (nuevo) |
+| `docs/API-ORDERS.md` | Creado (nuevo) |
+| `docs/PAYMENT-SIMULATION.md` | Creado (nuevo) |
+| `docs/UI-GUIDE.md` | Creado (nuevo) |
+| `docs/DEPLOYMENT.md` | Creado (nuevo) |
+| `docs/DEMO.md` | Creado (nuevo) |
+| `Progress.md` | F13 actualizado a DONE |
