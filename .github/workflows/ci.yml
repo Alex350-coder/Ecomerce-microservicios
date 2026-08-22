@@ -71,11 +71,17 @@ jobs:
         working-directory: ${{ matrix.dir }}
         run: npm run test:coverage
 
+      - name: Artifact name
+        if: always()
+        id: art
+        shell: bash
+        run: echo "name=coverage-$(echo '${{ matrix.dir }}' | tr '/' '-')" >> "$GITHUB_OUTPUT"
+
       - name: Upload coverage artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-${{ replace(matrix.dir, '/', '-') }}
+          name: ${{ steps.art.outputs.name }}
           path: ${{ matrix.dir }}/coverage/
           retention-days: 7
 
