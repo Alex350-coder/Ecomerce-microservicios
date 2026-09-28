@@ -7,6 +7,67 @@ Proyecto de portfolio que demuestra diseño de APIs, seguridad, testing y operac
 
 ---
 
+## Capturas de pantalla
+
+<table>
+<tr>
+<td width="50%">
+
+**Home**
+<img src="screenshots/01-home.jpg" alt="Home de ElectroShop" width="100%">
+
+</td>
+<td width="50%">
+
+**Catálogo de productos**
+<img src="screenshots/03-catalog.jpg" alt="Catálogo de productos" width="100%">
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**Detalle de producto**
+<img src="screenshots/04-product-detail.jpg" alt="Detalle de producto" width="100%">
+
+</td>
+<td width="50%">
+
+**Carrito de compras**
+<img src="screenshots/07-cart.jpg" alt="Carrito de compras" width="100%">
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**Checkout**
+<img src="screenshots/08-checkout.jpg" alt="Proceso de checkout" width="100%">
+
+</td>
+<td width="50%">
+
+**Pedido confirmado (pago simulado)**
+<img src="screenshots/10-order-confirmation.jpg" alt="Confirmación de pedido pagado" width="100%">
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**Historial de pedidos**
+<img src="screenshots/11-order-history.jpg" alt="Historial de pedidos" width="100%">
+
+</td>
+<td width="50%">
+
+**Registro / Login**
+<img src="screenshots/06-login.jpg" alt="Pantalla de login" width="100%">
+
+</td>
+</tr>
+</table>
+
 ## Arquitectura
 
 ```
@@ -65,6 +126,14 @@ cd core-services/product-service && npm run seed # 6 categorias + 12 productos
 **Credenciales demo:**
 - demo@electroshop.com / Demo123! (user)
 - admin@electroshop.com / Admin123! (admin)
+
+### Nota: `localhost` ocupado por otro proceso local
+
+Si en tu maquina `localhost:5173` o `localhost:8000` sirven contenido de **otro** proyecto (p. ej. otro
+dev server escuchando en `::1`), Chrome resuelve `localhost` a esa IPv6 antes que al contenedor Docker
+(que publica en `0.0.0.0`). Usa `http://127.0.0.1:5173` explicitamente para evitar el conflicto; el
+frontend ya usa la ruta relativa `/api` (proxy nginx → gateway) por lo que funciona igual sin importar
+el host usado.
 
 ## CI/CD
 
